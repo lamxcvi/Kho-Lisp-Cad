@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tối Ưu Cắt Vật Liệu</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
         .container { max-width: 900px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -13,7 +15,6 @@
         label { display: block; margin-bottom: 5px; color: #ce9178; font-weight: bold; }
         input { padding: 8px; border-radius: 4px; border: 1px solid #555; background: #222; color: white; width: 100px; text-align: center; font-weight: bold;}
         
-        /* Bảng nhập liệu */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { text-align: left; color: #aaa; padding: 5px; border-bottom: 1px solid #555; }
         td { padding: 5px; }
@@ -22,10 +23,16 @@
         
         .btn { border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; transition: 0.3s;}
         .btn-add { background: #569cd6; font-size: 14px;}
-        .btn-calc { background: #d16d00; width: 100%; font-size: 18px; margin-top: 20px;}
-        .btn-calc:hover { background: #e67e00; }
         .btn-del { background: #ff5555; padding: 5px 10px; }
         .btn-back { background-color: #444; margin-bottom: 20px; padding: 8px 15px; text-decoration: none; display: inline-block; color: white; border-radius: 4px;}
+        
+        /* Nút tính toán */
+        .btn-calc { background: #d16d00; width: 100%; font-size: 18px; margin-top: 20px;}
+        .btn-calc:hover { background: #e67e00; }
+
+        /* Nút xuất Excel (Mặc định ẩn) */
+        .btn-excel { background: #217346; width: 100%; font-size: 18px; margin-top: 10px; display: none; }
+        .btn-excel:hover { background: #1e6b41; }
 
         /* Kết quả */
         #result-area { margin-top: 30px; text-align: left; display: none; }
@@ -34,8 +41,8 @@
         
         .visual-bar { height: 30px; background: #333; display: flex; border-radius: 4px; overflow: hidden; margin-top: 5px;}
         .segment { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #000; font-weight: bold; border-right: 1px solid rgba(0,0,0,0.2); transition: width 0.5s;}
-        .seg-part { background: #4caf50; color: white;} /* Phần lấy */
-        .seg-waste { background: #ff5555; color: white;} /* Phần thừa */
+        .seg-part { background: #4caf50; color: white;}
+        .seg-waste { background: #ff5555; color: white;}
 
         .summary-box { background: #0e639c; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: white; }
     </style>
@@ -90,6 +97,7 @@
         </div>
 
         <button class="btn btn-calc" onclick="calculateCut()">🚀 TÍNH TOÁN PHƯƠNG ÁN CẮT</button>
+        <button class="btn btn btn-excel" id="btnExport" onclick="exportExcel()">📥 XUẤT FILE EXCEL (.XLSX)</button>
 
         <div id="result-area">
             <div class="summary-box" id="summary"></div>
@@ -98,6 +106,15 @@
     </div>
 
     <script>
+        // Biến toàn cục để lưu kết quả cho việc xuất Excel
+        let globalResult = {
+            bars: [],
+            stockLen: 0,
+            blade: 0,
+            totalWaste: 0,
+            wastePercent: 0
+        };
+
         function addRow() {
             const tbody = document.getElementById('tableBody');
             const rowCount = tbody.rows.length + 1;
@@ -145,28 +162,20 @@
 
             if(parts.length === 0) { alert("Vui lòng nhập kích thước cần cắt!"); return; }
 
-            // 2. Thuật toán Greedy (Sắp xếp giảm dần -> Nhét vào chỗ trống đầu tiên)
-            parts.sort((a, b) => b - a); // Dài nhất xếp trước
+            // 2. Thuật toán Greedy
+            parts.sort((a, b) => b - a);
 
-            let bars = []; // Danh sách các cây nguyên liệu đã dùng
-
+            let bars = [];
             parts.forEach(part => {
                 let placed = false;
-                
-                // Duyệt qua các cây đã có xem cây nào còn nhét vừa không
                 for (let bar of bars) {
-                    // Cần không gian = Dài đoạn + Lưỡi cắt
-                    // Tuy nhiên đoạn cuối cùng của cây không tốn lưỡi cắt sau nó, 
-                    // nhưng để an toàn và đơn giản, ta cứ tính trừ luôn mạch cắt cho mỗi đoạn.
                     if (bar.remaining >= part) {
                         bar.cuts.push(part);
-                        bar.remaining -= (part + blade); // Trừ đi đoạn cắt và mạch cưa
+                        bar.remaining -= (part + blade);
                         placed = true;
                         break;
                     }
                 }
-
-                // Nếu không cây nào vừa, lấy cây mới
                 if (!placed) {
                     let newBar = {
                         id: bars.length + 1,
@@ -177,7 +186,7 @@
                 }
             });
 
-            // 3. Hiển thị kết quả
+            // 3. Hiển thị kết quả & Lưu biến toàn cục
             renderResult(bars, stockLen, blade);
         }
 
@@ -185,19 +194,19 @@
             const resArea = document.getElementById('result-area');
             const summary = document.getElementById('summary');
             const list = document.getElementById('bars-list');
+            const btnExport = document.getElementById('btnExport');
             
-            // Tổng kết
             let totalWasteLen = 0;
             bars.forEach(b => {
-                // Tính lại phần thừa thực tế (bỏ qua mạch cắt cuối cùng nếu có)
-                // Nhưng logic hiển thị nên giữ nguyên theo thuật toán
                 if(b.remaining < 0) b.remaining = 0;
                 totalWasteLen += b.remaining;
             });
             
-            // Tính % hao hụt (Không tính mạch cắt là hao hụt mà là chi phí kỹ thuật, chỉ tính đầu thừa)
             let totalUsed = bars.length * stockLen;
             let wastePercent = (totalWasteLen / totalUsed * 100).toFixed(2);
+
+            // Lưu dữ liệu để xuất Excel
+            globalResult = { bars, stockLen, blade, totalWaste: totalWasteLen, wastePercent };
 
             summary.innerHTML = `
                 <h3>KẾT QUẢ TÍNH TOÁN</h3>
@@ -209,18 +218,13 @@
 
             bars.forEach(bar => {
                 let cutsHtml = "";
-                let currentPos = 0;
-                
                 bar.cuts.forEach(c => {
                     let widthPercent = (c / stockLen) * 100;
                     cutsHtml += `<div class="segment seg-part" style="width: ${widthPercent}%" title="Cắt: ${c}mm">${c}</div>`;
-                    
-                    // Vẽ mạch cắt (nếu nhỏ quá thì không hiện text)
                     let bladePercent = (blade / stockLen) * 100;
                     if(blade > 0) cutsHtml += `<div class="segment" style="width: ${bladePercent}%; background: #000;"></div>`;
                 });
 
-                // Vẽ phần thừa
                 let wasteLen = bar.remaining;
                 if (wasteLen > 0) {
                      let wastePercent = (wasteLen / stockLen) * 100;
@@ -236,14 +240,58 @@
                             <span style="color: #ff5555">Dư: ${wasteLen}mm</span>
                         </div>
                         <div style="font-size: 0.9em; color: #888;">Cắt: ${textDetail}</div>
-                        <div class="visual-bar">
-                            ${cutsHtml}
-                        </div>
+                        <div class="visual-bar">${cutsHtml}</div>
                     </div>
                 `;
             });
 
             resArea.style.display = "block";
+            btnExport.style.display = "inline-block"; // Hiện nút Excel
+        }
+
+        function exportExcel() {
+            if (globalResult.bars.length === 0) return;
+
+            // 1. Tạo dữ liệu Excel
+            // Dòng tiêu đề tổng hợp
+            const ws_data = [
+                ["BẢNG TÍNH CẮT VẬT LIỆU (CUTTING LIST)"],
+                ["Ngày xuất:", new Date().toLocaleString()],
+                [],
+                ["THÔNG SỐ ĐẦU VÀO"],
+                ["Chiều dài cây:", globalResult.stockLen + " mm"],
+                ["Mạch cắt (lưỡi cưa):", globalResult.blade + " mm"],
+                [],
+                ["TỔNG HỢP KẾT QUẢ"],
+                ["Tổng số cây:", globalResult.bars.length + " cây"],
+                ["Tổng phần thừa:", globalResult.totalWaste + " mm"],
+                ["Hao hụt:", globalResult.wastePercent + " %"],
+                [],
+                ["CHI TIẾT CẮT"],
+                ["STT Cây", "Các đoạn cắt (mm)", "Phần thừa (mm)"] // Header bảng
+            ];
+
+            // Dòng dữ liệu chi tiết
+            globalResult.bars.forEach(bar => {
+                ws_data.push([
+                    bar.id,
+                    bar.cuts.join(" + "),
+                    bar.remaining
+                ]);
+            });
+
+            // 2. Tạo Workbook và Worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+            // Chỉnh độ rộng cột cho đẹp
+            ws['!cols'] = [{wch: 10}, {wch: 40}, {wch: 15}];
+
+            // Thêm Sheet vào Workbook
+            XLSX.utils.book_append_sheet(wb, ws, "DanhSachCat");
+
+            // 3. Xuất file
+            XLSX.writeFile(wb, "Cutting_List.xlsx");
         }
     </script>
 </body>
