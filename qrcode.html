@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Mã QR Code Online</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { color: #4ec9b0; margin-top: 0; }
+        
+        .control-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 5px; color: #ce9178; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #555; background: #333; color: white; box-sizing: border-box; font-size: 16px; outline: none;}
+        input:focus { border-color: #4ec9b0; }
+
+        /* Khu vực hiển thị QR */
+        #qrcode-container {
+            background: white; /* QR bắt buộc nền trắng để dễ quét */
+            padding: 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 20px;
+            min-width: 200px;
+            min-height: 200px;
+        }
+        
+        /* Chỉnh ảnh QR nằm giữa */
+        #qrcode img { margin: 0 auto; display: block; }
+
+        .btn { border: none; padding: 12px 25px; border-radius: 5px; font-size: 16px; cursor: pointer; color: white; font-weight: bold; transition: 0.3s; display: inline-block; text-decoration: none; margin-top: 20px;}
+        
+        .btn-gen { background-color: #0e639c; width: 100%; }
+        .btn-gen:hover { background-color: #1177bb; }
+
+        .btn-download { background-color: #4caf50; }
+        .btn-download:hover { background-color: #45a049; }
+        
+        .btn-back { background-color: #444; margin-bottom: 20px; padding: 8px 15px; font-size: 14px;}
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn btn-back">⬅ Quay lại Trang chủ</a>
+
+    <div class="container">
+        <h1>📱 TẠO MÃ QR CODE</h1>
+        
+        <div class="control-group">
+            <label>1. Nhập nội dung (Link web, Văn bản, SĐT...):</label>
+            <input type="text" id="qrText" placeholder="Ví dụ: https://..." onkeypress="handleEnter(event)">
+        </div>
+
+        <button class="btn btn-gen" onclick="makeCode()">⚡ TẠO MÃ NGAY</button>
+
+        <br>
+
+        <div id="qrcode-container">
+            <div id="qrcode"></div>
+        </div>
+
+        <br>
+        <a id="downloadLink" class="btn btn-download" style="display: none;" onclick="downloadQR()">⬇ TẢI ẢNH QR (.PNG)</a>
+    </div>
+
+    <script>
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            width : 256,
+            height : 256,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+
+        // Hàm tạo mã
+        function makeCode() {    
+            var elText = document.getElementById("qrText");
+            
+            if (!elText.value) {
+                alert("Bạn chưa nhập nội dung!");
+                elText.focus();
+                return;
+            }
+            
+            // Xóa mã cũ và tạo mã mới
+            qrcode.makeCode(elText.value);
+            
+            // Hiện nút download
+            document.getElementById("downloadLink").style.display = "inline-block";
+        }
+
+        // Xử lý khi nhấn Enter
+        function handleEnter(e){
+            if(e.keyCode === 13){
+                makeCode();
+            }
+        }
+
+        // Hàm tải ảnh về
+        function downloadQR() {
+            // Tìm thẻ img sinh ra bởi thư viện
+            var img = document.querySelector("#qrcode img");
+            if(img && img.src) {
+                var link = document.createElement("a");
+                link.href = img.src;
+                link.download = "QR_Code.png";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert("Đang tạo ảnh, vui lòng đợi 1 giây rồi bấm lại!");
+            }
+        }
+        
+        // Tạo mã mặc định lúc đầu cho đẹp
+        qrcode.makeCode("https://github.com/");
+    </script>
+</body>
+</html>
