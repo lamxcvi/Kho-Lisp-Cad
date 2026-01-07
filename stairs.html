@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Chia Bậc Cầu Thang</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { color: #4ec9b0; margin-top: 0; }
+        
+        .control-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 5px; color: #ce9178; font-weight: bold; }
+        input { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #555; background: #333; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
+        
+        .btn { border: none; padding: 12px 25px; border-radius: 5px; font-size: 16px; cursor: pointer; color: white; font-weight: bold; width: 100%; background-color: #d16d00; transition: 0.3s; margin-top: 10px;}
+        .btn:hover { background-color: #e67e00; }
+        
+        .btn-back { background-color: #444; margin-bottom: 20px; padding: 8px 15px; font-size: 14px; display: inline-block; text-decoration: none; border-radius: 4px; color: white;}
+
+        /* Bảng kết quả */
+        .result-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        .result-table th { background: #333; color: #aaa; padding: 10px; text-align: left; }
+        .result-table td { border-bottom: 1px solid #444; padding: 12px; font-size: 1.1em; }
+        
+        .good-luck { color: #4caf50; font-weight: bold; } /* Cung tốt */
+        .bad-luck { color: #ff5555; font-weight: bold; } /* Cung xấu */
+
+        .note { font-size: 0.9em; color: #888; font-style: italic; margin-top: 10px; text-align: left;}
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn btn-back">⬅ Quay lại Trang chủ</a>
+
+    <div class="container">
+        <h1>📐 TÍNH CHIA BẬC CẦU THANG</h1>
+        
+        <div class="control-group">
+            <label>1. Chiều cao tầng (hoàn thiện) - mm:</label>
+            <input type="number" id="floorHeight" placeholder="Ví dụ: 3600" value="3600">
+        </div>
+
+        <div class="control-group">
+            <label>2. Khoảng chiều cao bậc mong muốn (mm):</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="minH" value="150" placeholder="Min">
+                <input type="number" id="maxH" value="180" placeholder="Max">
+            </div>
+        </div>
+
+        <button class="btn" onclick="calculateStairs()">TÍNH TOÁN PHƯƠNG ÁN</button>
+
+        <table class="result-table" id="resultTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Số bậc</th>
+                    <th>Cao mỗi bậc (mm)</th>
+                    <th>Phong Thủy (4n+1)</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+        
+        <p class="note" id="noteText" style="display: none;">
+            *Công thức phong thủy: Sinh (1), Lão (2), Bệnh (3), Tử (4).<br>
+            Ưu tiên rơi vào cung <b>Sinh (4n+1)</b>.
+        </p>
+    </div>
+
+    <script>
+        function calculateStairs() {
+            const H = parseInt(document.getElementById('floorHeight').value);
+            const min = parseInt(document.getElementById('minH').value);
+            const max = parseInt(document.getElementById('maxH').value);
+            const tbody = document.getElementById('tableBody');
+            const table = document.getElementById('resultTable');
+            const note = document.getElementById('noteText');
+
+            if (!H || !min || !max) { alert("Vui lòng nhập đủ thông số!"); return; }
+
+            tbody.innerHTML = ""; // Xóa kết quả cũ
+            
+            // Tính số bậc tối thiểu và tối đa có thể
+            // Ví dụ: 3600 / 180 = 20 bậc (ít nhất)
+            // Ví dụ: 3600 / 150 = 24 bậc (nhiều nhất)
+            
+            const minSteps = Math.ceil(H / max);
+            const maxSteps = Math.floor(H / min);
+
+            let found = false;
+
+            for (let i = minSteps; i <= maxSteps; i++) {
+                const stepHeight = (H / i).toFixed(1); // Chia đều
+                
+                // Tính cung phong thủy (Chu kỳ 4: Sinh-Lão-Bệnh-Tử)
+                const remainder = i % 4;
+                let fengshui = "";
+                let cssClass = "";
+
+                if (remainder === 1) { fengshui = "SINH (Tốt nhất)"; cssClass = "good-luck"; }
+                else if (remainder === 2) { fengshui = "LÃO (Tốt)"; cssClass = "good-luck"; }
+                else if (remainder === 3) { fengshui = "BỆNH (Xấu)"; cssClass = "bad-luck"; }
+                else { fengshui = "TỬ (Rất xấu)"; cssClass = "bad-luck"; }
+
+                const row = `<tr>
+                    <td><b>${i} bậc</b></td>
+                    <td>${stepHeight}</td>
+                    <td class="${cssClass}">${fengshui}</td>
+                </tr>`;
+                
+                tbody.innerHTML += row;
+                found = true;
+            }
+
+            if (!found) {
