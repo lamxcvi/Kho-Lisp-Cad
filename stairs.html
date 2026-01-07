@@ -20,8 +20,8 @@
 
         /* Bảng kết quả */
         .result-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-        .result-table th { background: #333; color: #aaa; padding: 10px; text-align: left; }
-        .result-table td { border-bottom: 1px solid #444; padding: 12px; font-size: 1.1em; }
+        .result-table th { background: #333; color: #aaa; padding: 10px; text-align: center; border: 1px solid #444; }
+        .result-table td { border: 1px solid #444; padding: 12px; font-size: 1.1em; text-align: center; }
         
         .good-luck { color: #4caf50; font-weight: bold; } /* Cung tốt */
         .bad-luck { color: #ff5555; font-weight: bold; } /* Cung xấu */
@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <button class="btn" onclick="calculateStairs()">TÍNH TOÁN PHƯƠNG ÁN</button>
+        <button class="btn" id="calcBtn">TÍNH TOÁN PHƯƠNG ÁN</button>
 
         <table class="result-table" id="resultTable" style="display: none;">
             <thead>
@@ -70,48 +70,75 @@
     </div>
 
     <script>
+        // Gán sự kiện cho nút bấm
+        document.getElementById("calcBtn").addEventListener("click", calculateStairs);
+
         function calculateStairs() {
-            const H = parseInt(document.getElementById('floorHeight').value);
-            const min = parseInt(document.getElementById('minH').value);
-            const max = parseInt(document.getElementById('maxH').value);
-            const tbody = document.getElementById('tableBody');
-            const table = document.getElementById('resultTable');
-            const note = document.getElementById('noteText');
-
-            if (!H || !min || !max) { alert("Vui lòng nhập đủ thông số!"); return; }
-
-            tbody.innerHTML = ""; // Xóa kết quả cũ
-            
-            // Tính số bậc tối thiểu và tối đa có thể
-            // Ví dụ: 3600 / 180 = 20 bậc (ít nhất)
-            // Ví dụ: 3600 / 150 = 24 bậc (nhiều nhất)
-            
-            const minSteps = Math.ceil(H / max);
-            const maxSteps = Math.floor(H / min);
-
-            let found = false;
-
-            for (let i = minSteps; i <= maxSteps; i++) {
-                const stepHeight = (H / i).toFixed(1); // Chia đều
+            try {
+                // Lấy giá trị
+                var floorH = document.getElementById('floorHeight').value;
+                var minH = document.getElementById('minH').value;
+                var maxH = document.getElementById('maxH').value;
                 
-                // Tính cung phong thủy (Chu kỳ 4: Sinh-Lão-Bệnh-Tử)
-                const remainder = i % 4;
-                let fengshui = "";
-                let cssClass = "";
+                var H = parseInt(floorH);
+                var min = parseInt(minH);
+                var max = parseInt(maxH);
 
-                if (remainder === 1) { fengshui = "SINH (Tốt nhất)"; cssClass = "good-luck"; }
-                else if (remainder === 2) { fengshui = "LÃO (Tốt)"; cssClass = "good-luck"; }
-                else if (remainder === 3) { fengshui = "BỆNH (Xấu)"; cssClass = "bad-luck"; }
-                else { fengshui = "TỬ (Rất xấu)"; cssClass = "bad-luck"; }
+                var tbody = document.getElementById('tableBody');
+                var table = document.getElementById('resultTable');
+                var note = document.getElementById('noteText');
 
-                const row = `<tr>
-                    <td><b>${i} bậc</b></td>
-                    <td>${stepHeight}</td>
-                    <td class="${cssClass}">${fengshui}</td>
-                </tr>`;
+                // Kiểm tra nhập liệu
+                if (!H || !min || !max) { 
+                    alert("Vui lòng nhập đầy đủ các con số!"); 
+                    return; 
+                }
+
+                // Xóa kết quả cũ
+                tbody.innerHTML = ""; 
                 
-                tbody.innerHTML += row;
-                found = true;
+                // Tính toán
+                var minSteps = Math.ceil(H / max);
+                var maxSteps = Math.floor(H / min);
+
+                var found = false;
+
+                for (var i = minSteps; i <= maxSteps; i++) {
+                    var stepHeight = (H / i).toFixed(1); // Chia đều, lấy 1 số lẻ
+                    
+                    // Tính Phong Thủy (Sinh-Lão-Bệnh-Tử)
+                    var remainder = i % 4;
+                    var fengshui = "";
+                    var cssClass = "";
+
+                    if (remainder === 1) { fengshui = "SINH (Rất Tốt)"; cssClass = "good-luck"; }
+                    else if (remainder === 2) { fengshui = "LÃO (Tốt)"; cssClass = "good-luck"; }
+                    else if (remainder === 3) { fengshui = "BỆNH (Xấu)"; cssClass = "bad-luck"; }
+                    else { fengshui = "TỬ (Rất Xấu)"; cssClass = "bad-luck"; }
+
+                    // Tạo dòng kết quả
+                    var row = "<tr>" +
+                        "<td><b>" + i + " bậc</b></td>" +
+                        "<td>" + stepHeight + "</td>" +
+                        "<td class='" + cssClass + "'>" + fengshui + "</td>" +
+                    "</tr>";
+                    
+                    tbody.innerHTML += row;
+                    found = true;
+                }
+
+                if (!found) {
+                    tbody.innerHTML = "<tr><td colspan='3' style='color: yellow'>Không có phương án nào!<br>Hãy nới rộng khoảng chiều cao bậc (Min-Max).</td></tr>";
+                }
+
+                // Hiện bảng
+                table.style.display = "table";
+                note.style.display = "block";
+
+            } catch (err) {
+                alert("Lỗi code: " + err.message);
             }
-
-            if (!found) {
+        }
+    </script>
+</body>
+</html>
