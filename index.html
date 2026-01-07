@@ -7,14 +7,24 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; }
-        h1 { color: #4ec9b0; text-align: center; }
-        .search-box { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: none; font-size: 16px; box-sizing: border-box; }
+        h1 { color: #4ec9b0; text-align: center; margin-bottom: 5px;}
+        .subtitle { text-align: center; color: #808080; margin-bottom: 30px; font-style: italic;}
+        
+        /* KHU VỰC NÚT ZALO */
+        .zalo-section { text-align: center; margin-bottom: 30px; padding: 20px; background: #2d2d30; border-radius: 8px; border: 1px dashed #0088ff; }
+        .zalo-btn { background-color: #0068ff; color: white; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 50px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .zalo-btn:hover { background-color: #0056d6; transform: scale(1.05); }
+
+        .search-box { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 5px; border: none; font-size: 16px; box-sizing: border-box; outline: none;}
         .lisp-item { background-color: #252526; padding: 15px; margin-bottom: 15px; border-left: 5px solid #ce9178; border-radius: 4px; }
         .lisp-title { font-size: 1.2em; font-weight: bold; color: #9cdcfe; }
         .lisp-desc { font-style: italic; color: #808080; margin: 5px 0; }
         .btn-group { margin-top: 10px; }
-        a, button { text-decoration: none; background: #0e639c; color: white; padding: 8px 15px; border-radius: 4px; border: none; cursor: pointer; display: inline-block; font-size: 14px; margin-right: 5px; margin-bottom: 5px;}
-        a:hover, button:hover { background: #1177bb; }
+        
+        /* Button Style */
+        button { text-decoration: none; border-radius: 4px; border: none; cursor: pointer; display: inline-block; font-size: 14px; margin-right: 5px; margin-bottom: 5px; padding: 8px 15px; color: white;}
+        .download-btn { background: #0e639c; }
+        .download-btn:hover { background: #1177bb; }
         .copy-btn { background: #4caf50; }
         .copy-btn:hover { background: #45a049; }
     </style>
@@ -23,13 +33,22 @@
 
 <div class="container">
     <h1>📚 KHO LISP CỦA TÔI</h1>
-    <input type="text" id="search" class="search-box" placeholder="🔍 Tìm kiếm (ví dụ: khung tên, màu, đếm, đo...)" onkeyup="filterLisp()">
+    <div class="subtitle">Công cụ hỗ trợ triển khai bản vẽ kỹ thuật</div>
+
+    <div class="zalo-section">
+        <p style="margin-top: 0;">🔒 File có đặt mật khẩu bảo vệ.</p>
+        <a href="https://zalo.me/0944699619" target="_blank" class="zalo-btn">
+            💬 Nhắn Zalo lấy Mật Khẩu
+        </a>
+    </div>
+
+    <input type="text" id="search" class="search-box" placeholder="🔍 Tìm kiếm lisp..." onkeyup="filterLisp()">
 
     <div class="lisp-item">
         <div class="lisp-title">TL - Tính tổng chiều dài</div>
         <div class="lisp-desc">Tính tổng chiều dài các đường Line, Pline, Arc... dùng để bốc khối lượng dây, ống.</div>
         <div class="btn-group">
-            <a href="TL.lsp" download>⬇ Tải về (.lsp)</a>
+            <button class="download-btn" onclick="checkPassAndDownload('TL.lsp')">⬇ Tải về (.lsp)</button>
             <button class="copy-btn" onclick="copyLink('TL.lsp')">🔗 Copy Link</button>
         </div>
     </div>
@@ -38,16 +57,16 @@
         <div class="lisp-title">CB - Đếm số lượng Block</div>
         <div class="lisp-desc">Thống kê số lượng Block (ổ cắm, đèn, thiết bị) và xuất bảng tổng hợp.</div>
         <div class="btn-group">
-            <a href="CB.lsp" download>⬇ Tải về (.lsp)</a>
+            <button class="download-btn" onclick="checkPassAndDownload('CB.lsp')">⬇ Tải về (.lsp)</button>
             <button class="copy-btn" onclick="copyLink('CB.lsp')">🔗 Copy Link</button>
         </div>
     </div>
 
     <div class="lisp-item">
         <div class="lisp-title">TC2I - Chuyển màu TrueColor sang Index</div>
-        <div class="lisp-desc">Chuyển đổi toàn bộ màu Layer từ hệ TrueColor (RGB) sang Index Color (256 màu) để sửa lỗi in ấn theo nét (CTB).</div>
+        <div class="lisp-desc">Chuyển đổi toàn bộ màu Layer từ hệ TrueColor (RGB) sang Index Color (256 màu) để sửa lỗi in ấn.</div>
         <div class="btn-group">
-            <a href="TC2I.lsp" download>⬇ Tải về (.lsp)</a>
+            <button class="download-btn" onclick="checkPassAndDownload('TC2I.lsp')">⬇ Tải về (.lsp)</button>
             <button class="copy-btn" onclick="copyLink('TC2I.lsp')">🔗 Copy Link</button>
         </div>
     </div>
@@ -56,7 +75,7 @@
         <div class="lisp-title">UpdateTitleBlock - Cập nhật khung tên</div>
         <div class="lisp-desc">Tự động cập nhật thông tin, ngày tháng, tên bản vẽ cho Block khung tên hàng loạt.</div>
         <div class="btn-group">
-            <a href="UpdateTitleBlock.lsp" download>⬇ Tải về (.lsp)</a>
+            <button class="download-btn" onclick="checkPassAndDownload('UpdateTitleBlock.lsp')">⬇ Tải về (.lsp)</button>
             <button class="copy-btn" onclick="copyLink('UpdateTitleBlock.lsp')">🔗 Copy Link</button>
         </div>
     </div>
@@ -64,6 +83,27 @@
 </div>
 
 <script>
+    // --- CẤU HÌNH MẬT KHẨU TẠI ĐÂY ---
+    const SITE_PASSWORD = "Hoanglam@1996"; // Bạn hãy sửa số 123 thành mật khẩu bạn muốn
+    // ---------------------------------
+
+    function checkPassAndDownload(filename) {
+        var inputPass = prompt("Vui lòng nhập mật khẩu để tải file " + filename + ":");
+        
+        if (inputPass === SITE_PASSWORD) {
+            // Nếu đúng mật khẩu thì tạo link tải
+            var link = document.createElement("a");
+            link.href = filename;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else if (inputPass != null) {
+            // Nếu sai mật khẩu (và không phải do bấm Cancel)
+            alert("❌ Mật khẩu không đúng! Vui lòng liên hệ Zalo để lấy pass.");
+        }
+    }
+
     function filterLisp() {
         var input = document.getElementById('search');
         var filter = input.value.toUpperCase();
@@ -77,20 +117,17 @@
             }
         }
     }
+    
     function copyLink(filename) {
         var currentUrl = window.location.href;
-        // Xóa phần index.html để lấy thư mục gốc, đảm bảo link sạch
         var baseUrl = currentUrl.replace('index.html', '');
-        // Xóa dấu / ở cuối nếu có để tránh bị 2 dấu //
-        if (baseUrl.endsWith('/')) {
-             baseUrl = baseUrl.slice(0, -1);
-        }
+        if (baseUrl.endsWith('/')) { baseUrl = baseUrl.slice(0, -1); }
         var fullLink = baseUrl + '/' + filename;
         
         navigator.clipboard.writeText(fullLink).then(function() {
-            alert("Đã copy link tải: " + filename);
+            alert("Đã copy link: " + filename + "\n(Lưu ý: Link này gửi cho người khác vẫn cần mật khẩu hoặc họ phải vào web để tải)");
         }, function(err) {
-            alert("Lỗi copy link. Bạn hãy thử chuột phải vào nút Tải về -> Copy Link Address");
+            alert("Lỗi copy link.");
         });
     }
 </script>
