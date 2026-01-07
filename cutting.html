@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tối Ưu Cắt Vật Liệu</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
+        .container { max-width: 900px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { color: #4ec9b0; margin-top: 0; }
+        
+        .control-group { margin-bottom: 20px; text-align: left; background: #333; padding: 15px; border-radius: 8px;}
+        label { display: block; margin-bottom: 5px; color: #ce9178; font-weight: bold; }
+        input { padding: 8px; border-radius: 4px; border: 1px solid #555; background: #222; color: white; width: 100px; text-align: center; font-weight: bold;}
+        
+        /* Bảng nhập liệu */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; color: #aaa; padding: 5px; border-bottom: 1px solid #555; }
+        td { padding: 5px; }
+        .input-len { width: 100%; box-sizing: border-box; }
+        .input-qty { width: 100%; box-sizing: border-box; }
+        
+        .btn { border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; transition: 0.3s;}
+        .btn-add { background: #569cd6; font-size: 14px;}
+        .btn-calc { background: #d16d00; width: 100%; font-size: 18px; margin-top: 20px;}
+        .btn-calc:hover { background: #e67e00; }
+        .btn-del { background: #ff5555; padding: 5px 10px; }
+        .btn-back { background-color: #444; margin-bottom: 20px; padding: 8px 15px; text-decoration: none; display: inline-block; color: white; border-radius: 4px;}
+
+        /* Kết quả */
+        #result-area { margin-top: 30px; text-align: left; display: none; }
+        .bar-container { margin-bottom: 20px; background: #1e1e1e; border: 1px solid #444; padding: 10px; border-radius: 5px; }
+        .bar-title { font-weight: bold; color: #4ec9b0; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        
+        .visual-bar { height: 30px; background: #333; display: flex; border-radius: 4px; overflow: hidden; margin-top: 5px;}
+        .segment { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #000; font-weight: bold; border-right: 1px solid rgba(0,0,0,0.2); transition: width 0.5s;}
+        .seg-part { background: #4caf50; color: white;} /* Phần lấy */
+        .seg-waste { background: #ff5555; color: white;} /* Phần thừa */
+
+        .summary-box { background: #0e639c; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: white; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-back">⬅ Quay lại Trang chủ</a>
+
+    <div class="container">
+        <h1>✂️ TỐI ƯU CẮT VẬT LIỆU</h1>
+        
+        <div class="control-group">
+            <div style="display: flex; gap: 20px; align-items: flex-end;">
+                <div>
+                    <label>Chiều dài cây nguyên (mm):</label>
+                    <input type="number" id="stockLength" value="6000">
+                </div>
+                <div>
+                    <label>Độ dày lưỡi cắt (mm):</label>
+                    <input type="number" id="bladeWidth" value="5">
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>Danh sách cần cắt:</label>
+            <table id="inputTable">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Chiều dài (mm)</th>
+                        <th>Số lượng</th>
+                        <th>Xóa</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td>1</td>
+                        <td><input type="number" class="input-len" value="1500"></td>
+                        <td><input type="number" class="input-qty" value="2"></td>
+                        <td><button class="btn btn-del" onclick="deleteRow(this)">X</button></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><input type="number" class="input-len" value="2000"></td>
+                        <td><input type="number" class="input-qty" value="3"></td>
+                        <td><button class="btn btn-del" onclick="deleteRow(this)">X</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-add" onclick="addRow()">+ Thêm dòng</button>
+        </div>
+
+        <button class="btn btn-calc" onclick="calculateCut()">🚀 TÍNH TOÁN PHƯƠNG ÁN CẮT</button>
+
+        <div id="result-area">
+            <div class="summary-box" id="summary"></div>
+            <div id="bars-list"></div>
+        </div>
+    </div>
+
+    <script>
+        function addRow() {
+            const tbody = document.getElementById('tableBody');
+            const rowCount = tbody.rows.length + 1;
+            const row = `
+                <tr>
+                    <td>${rowCount}</td>
+                    <td><input type="number" class="input-len" placeholder="Nhập dài"></td>
+                    <td><input type="number" class="input-qty" value="1"></td>
+                    <td><button class="btn btn-del" onclick="deleteRow(this)">X</button></td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', row);
+            updateIndex();
+        }
+
+        function deleteRow(btn) {
+            btn.closest('tr').remove();
+            updateIndex();
+        }
+
+        function updateIndex() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach((row, index) => {
+                row.cells[0].innerText = index + 1;
+            });
+        }
+
+        function calculateCut() {
+            const stockLen = parseInt(document.getElementById('stockLength').value);
+            const blade = parseInt(document.getElementById('bladeWidth').value);
+            
+            // 1. Lấy dữ liệu input
+            let parts = [];
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                const len = parseInt(row.querySelector('.input-len').value);
+                const qty = parseInt(row.querySelector('.input-qty').value);
+                if (len && qty && len > 0 && qty > 0) {
+                    if (len > stockLen) {
+                        alert(`Lỗi: Đoạn ${len}mm dài hơn cây nguyên (${stockLen}mm)!`);
+                        return;
+                    }
+                    for(let i=0; i<qty; i++) parts.push(len);
+                }
+            });
+
+            if(parts.length === 0) { alert("Vui lòng nhập kích thước cần cắt!"); return; }
+
+            // 2. Thuật toán Greedy (Sắp xếp giảm dần -> Nhét vào chỗ trống đầu tiên)
+            parts.sort((a, b) => b - a); // Dài nhất xếp trước
+
+            let bars = []; // Danh sách các cây nguyên liệu đã dùng
+
+            parts.forEach(part => {
+                let placed = false;
+                
+                // Duyệt qua các cây đã có xem cây nào còn nhét vừa không
+                for (let bar of bars) {
+                    // Cần không gian = Dài đoạn + Lưỡi cắt
+                    // Tuy nhiên đoạn cuối cùng của cây không tốn lưỡi cắt sau nó, 
+                    // nhưng để an toàn và đơn giản, ta cứ tính trừ luôn mạch cắt cho mỗi đoạn.
+                    if (bar.remaining >= part) {
+                        bar.cuts.push(part);
+                        bar.remaining -= (part + blade); // Trừ đi đoạn cắt và mạch cưa
+                        placed = true;
+                        break;
+                    }
+                }
+
+                // Nếu không cây nào vừa, lấy cây mới
+                if (!placed) {
+                    let newBar = {
+                        id: bars.length + 1,
+                        cuts: [part],
+                        remaining: stockLen - part - blade
+                    };
+                    bars.push(newBar);
+                }
+            });
+
+            // 3. Hiển thị kết quả
+            renderResult(bars, stockLen, blade);
+        }
+
+        function renderResult(bars, stockLen, blade) {
+            const resArea = document.getElementById('result-area');
+            const summary = document.getElementById('summary');
+            const list = document.getElementById('bars-list');
+            
+            // Tổng kết
+            let totalWasteLen = 0;
+            bars.forEach(b => {
+                // Tính lại phần thừa thực tế (bỏ qua mạch cắt cuối cùng nếu có)
+                // Nhưng logic hiển thị nên giữ nguyên theo thuật toán
+                if(b.remaining < 0) b.remaining = 0;
+                totalWasteLen += b.remaining;
+            });
+            
+            // Tính % hao hụt (Không tính mạch cắt là hao hụt mà là chi phí kỹ thuật, chỉ tính đầu thừa)
+            let totalUsed = bars.length * stockLen;
+            let wastePercent = (totalWasteLen / totalUsed * 100).toFixed(2);
+
+            summary.innerHTML = `
+                <h3>KẾT QUẢ TÍNH TOÁN</h3>
+                <div>Tổng số cây cần dùng: <b>${bars.length} cây</b> (L= ${stockLen}mm)</div>
+                <div>Tổng đoạn thừa (Decal): <b>${totalWasteLen} mm</b> (${wastePercent}%)</div>
+            `;
+
+            list.innerHTML = "";
+
+            bars.forEach(bar => {
+                let cutsHtml = "";
+                let currentPos = 0;
+                
+                bar.cuts.forEach(c => {
+                    let widthPercent = (c / stockLen) * 100;
+                    cutsHtml += `<div class="segment seg-part" style="width: ${widthPercent}%" title="Cắt: ${c}mm">${c}</div>`;
+                    
+                    // Vẽ mạch cắt (nếu nhỏ quá thì không hiện text)
+                    let bladePercent = (blade / stockLen) * 100;
+                    if(blade > 0) cutsHtml += `<div class="segment" style="width: ${bladePercent}%; background: #000;"></div>`;
+                });
+
+                // Vẽ phần thừa
+                let wasteLen = bar.remaining;
+                if (wasteLen > 0) {
+                     let wastePercent = (wasteLen / stockLen) * 100;
+                     cutsHtml += `<div class="segment seg-waste" style="width: ${wastePercent}%" title="Thừa: ${wasteLen}mm">${wasteLen}</div>`;
+                }
+
+                let textDetail = bar.cuts.join(" + ");
+
+                list.innerHTML += `
+                    <div class="bar-container">
+                        <div class="bar-title">
+                            <span>Cây số ${bar.id}</span>
+                            <span style="color: #ff5555">Dư: ${wasteLen}mm</span>
+                        </div>
+                        <div style="font-size: 0.9em; color: #888;">Cắt: ${textDetail}</div>
+                        <div class="visual-bar">
+                            ${cutsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            resArea.style.display = "block";
+        }
+    </script>
+</body>
+</html>
