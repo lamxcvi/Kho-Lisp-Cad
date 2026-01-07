@@ -3,50 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kho Lisp CAD Của Tôi</title>
+    <title>Kho Tài Nguyên Thiết Kế</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; padding-bottom: 80px; /* Thêm khoảng trống dưới cùng để không bị nút che */ }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; padding-bottom: 80px; scroll-behavior: smooth; }
         .container { max-width: 800px; margin: 0 auto; }
         h1 { color: #4ec9b0; text-align: center; margin-bottom: 5px;}
-        .subtitle { text-align: center; color: #808080; margin-bottom: 30px; font-style: italic;}
+        .subtitle { text-align: center; color: #808080; margin-bottom: 20px; font-style: italic;}
         
         /* KHU VỰC NÚT ZALO TRÊN CÙNG */
-        .zalo-section { text-align: center; margin-bottom: 30px; padding: 20px; background: #2d2d30; border-radius: 8px; border: 1px dashed #0088ff; }
-        .zalo-btn { background-color: #0068ff; color: white; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 50px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; text-decoration: none;}
+        .zalo-section { text-align: center; margin-bottom: 20px; padding: 15px; background: #252526; border-radius: 8px; border: 1px dashed #0088ff; }
+        .zalo-btn { background-color: #0068ff; color: white; padding: 10px 20px; font-size: 15px; font-weight: bold; border-radius: 50px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; text-decoration: none;}
         .zalo-btn:hover { background-color: #0056d6; transform: scale(1.05); }
 
-        /* NÚT "VIẾT LISP THEO YÊU CẦU" (GÓC DƯỚI PHẢI) */
-        .floating-cta {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #d16d00; /* Màu Cam nổi bật */
-            color: white;
-            padding: 15px 25px;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            font-weight: bold;
-            text-decoration: none;
-            z-index: 1000;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            border: 2px solid #fff;
-            font-size: 15px;
-        }
-        .floating-cta:hover {
-            transform: scale(1.1);
-            background-color: #e67e00;
-            box-shadow: 0 6px 20px rgba(230, 126, 0, 0.4);
-        }
+        /* THANH ĐIỀU HƯỚNG NHANH */
+        .nav-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;}
+        .nav-item { padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; text-decoration: none; color: white; border: 1px solid #444; background: #333;}
+        .nav-item:hover { background: #444; }
+        .nav-cad { border-color: #ce9178; color: #ce9178; }
+        .nav-revit { border-color: #569cd6; color: #569cd6; }
+        .nav-su { border-color: #d16d00; color: #d16d00; }
 
-        .search-box { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 5px; border: none; font-size: 16px; box-sizing: border-box; outline: none;}
-        .lisp-item { background-color: #252526; padding: 15px; margin-bottom: 15px; border-left: 5px solid #ce9178; border-radius: 4px; }
-        .lisp-title { font-size: 1.2em; font-weight: bold; color: #9cdcfe; }
+        /* TIÊU ĐỀ TỪNG MỤC */
+        .section-header { margin-top: 40px; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #333; font-size: 1.4em; font-weight: bold; display: flex; align-items: center;}
+        .section-icon { margin-right: 10px; }
+        
+        /* ITEM CHUNG */
+        .lisp-item { background-color: #252526; padding: 15px; margin-bottom: 15px; border-radius: 4px; border-left: 5px solid #808080; }
+        
+        /* MÀU SẮC RIÊNG CHO TỪNG LOẠI */
+        .type-cad { border-left-color: #ce9178; } /* Màu Cam đất cho CAD */
+        .type-revit { border-left-color: #569cd6; } /* Màu Xanh dương cho Revit */
+        .type-su { border-left-color: #d16d00; } /* Màu Đỏ cam cho SketchUp */
+
+        .lisp-title { font-size: 1.2em; font-weight: bold; color: #dcdcaa; }
         .lisp-desc { font-style: italic; color: #808080; margin: 5px 0; }
         .btn-group { margin-top: 10px; }
-        
-        /* STYLE CHO CÁC NÚT BẤM */
+
+        /* NÚT "VIẾT TOOL THEO YÊU CẦU" (TRÔI NỔI) */
+        .floating-cta {
+            position: fixed; bottom: 20px; right: 20px;
+            background-color: #d16d00; color: white;
+            padding: 15px 25px; border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            font-weight: bold; text-decoration: none; z-index: 1000;
+            transition: all 0.3s; display: flex; align-items: center; border: 2px solid #fff; font-size: 15px;
+        }
+        .floating-cta:hover { transform: scale(1.1); background-color: #e67e00; }
+
+        /* SEARCH BOX */
+        .search-box { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 5px; border: none; font-size: 16px; box-sizing: border-box; outline: none; background: #3c3c3c; color: white;}
+
+        /* BUTTONS */
         button { text-decoration: none; border-radius: 4px; border: none; cursor: pointer; display: inline-block; font-size: 13px; margin-right: 5px; margin-bottom: 5px; padding: 8px 12px; color: white; font-weight: 500;}
         .download-btn { background: #0e639c; } 
         .download-btn:hover { background: #1177bb; }
@@ -55,36 +62,39 @@
         .guide-btn { background: #606060; } 
         .guide-btn:hover { background: #808080; }
 
-        /* STYLE CHO POPUP HƯỚNG DẪN */
+        /* POPUP MODAL */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); }
-        .modal-content { background-color: #252526; margin: 15% auto; padding: 20px; border: 1px solid #ce9178; width: 80%; max-width: 500px; border-radius: 8px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .modal-content { background-color: #252526; margin: 15% auto; padding: 20px; border: 1px solid #444; width: 85%; max-width: 500px; border-radius: 8px; position: relative; }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .close:hover, .close:focus { color: #fff; text-decoration: none; cursor: pointer; }
-        .modal-header { font-size: 1.2em; color: #ce9178; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;}
-        .modal-body { line-height: 1.6; font-size: 15px;}
         .cmd-highlight { background: #444; padding: 2px 6px; border-radius: 3px; color: #4ec9b0; font-family: monospace; }
     </style>
 </head>
 <body>
 
-<a href="zalo://conversation?phone=84944699619" class="floating-cta">
-    ✍ Viết lisp theo yêu cầu
-</a>
+<a href="zalo://conversation?phone=84944699619" class="floating-cta">✍ Viết Tool theo yêu cầu</a>
 
 <div class="container">
-    <h1>📚 KHO LISP CỦA TÔI</h1>
-    <div class="subtitle">Công cụ hỗ trợ triển khai bản vẽ kỹ thuật</div>
+    <h1>📚 KHO TÀI NGUYÊN</h1>
+    <div class="subtitle">AutoCAD • Revit • SketchUp</div>
 
     <div class="zalo-section">
-        <p style="margin-top: 0;">🔒 File có đặt mật khẩu bảo vệ.</p>
-        <a href="zalo://conversation?phone=84944699619" class="zalo-btn">
-            💬 Mở Zalo Chat Lấy Pass
-        </a>
+        <p style="margin-top: 0; margin-bottom: 10px;">🔒 File có mật khẩu. Nhắn Zalo để lấy Pass.</p>
+        <a href="zalo://conversation?phone=84944699619" class="zalo-btn">💬 Mở Zalo Chat Ngay</a>
     </div>
 
-    <input type="text" id="search" class="search-box" placeholder="🔍 Tìm kiếm..." onkeyup="filterLisp()">
+    <input type="text" id="search" class="search-box" placeholder="🔍 Tìm kiếm tool..." onkeyup="filterLisp()">
+    
+    <div class="nav-bar">
+        <a href="#section-cad" class="nav-item nav-cad">LISP AUTOCAD</a>
+        <a href="#section-revit" class="nav-item nav-revit">ADD-IN REVIT</a>
+        <a href="#section-su" class="nav-item nav-su">PLUGIN SKETCHUP</a>
+    </div>
 
-    <div class="lisp-item">
+    <div id="section-cad" class="section-header" style="color: #ce9178;">
+        <span class="section-icon">📐</span> LISP AUTOCAD
+    </div>
+
+    <div class="lisp-item type-cad">
         <div class="lisp-title">TL - Tính tổng chiều dài</div>
         <div class="lisp-desc">Tính tổng chiều dài các đường Line, Pline, Arc...</div>
         <div class="btn-group">
@@ -94,7 +104,7 @@
         </div>
     </div>
 
-    <div class="lisp-item">
+    <div class="lisp-item type-cad">
         <div class="lisp-title">CB - Đếm số lượng Block</div>
         <div class="lisp-desc">Thống kê số lượng Block và xuất bảng tổng hợp.</div>
         <div class="btn-group">
@@ -104,13 +114,41 @@
         </div>
     </div>
 
-    <div class="lisp-item">
+    <div class="lisp-item type-cad">
         <div class="lisp-title">TC2I - Chuyển màu TrueColor</div>
         <div class="lisp-desc">Chuyển đổi màu TrueColor sang Index Color để in ấn.</div>
         <div class="btn-group">
             <button class="download-btn" onclick="checkPassAndDownload('TC2I.lsp')">⬇ Tải về</button>
             <button class="copy-btn" onclick="copyLink('TC2I.lsp')">🔗 Copy Link</button>
             <button class="guide-btn" onclick="openGuide('TC2I')">📖 Hướng dẫn</button>
+        </div>
+    </div>
+
+    <div id="section-revit" class="section-header" style="color: #569cd6;">
+        <span class="section-icon">🏢</span> ADD-IN REVIT
+    </div>
+
+    <div class="lisp-item type-revit">
+        <div class="lisp-title">AutoJoin - Tự động Join Bê tông</div>
+        <div class="lisp-desc">Tự động Join Cột, Dầm, Sàn theo thứ tự ưu tiên vật liệu.</div>
+        <div class="btn-group">
+            <button class="download-btn" onclick="checkPassAndDownload('AutoJoin.zip')">⬇ Tải về</button>
+            <button class="copy-btn" onclick="copyLink('AutoJoin.zip')">🔗 Copy Link</button>
+            <button class="guide-btn" onclick="openGuide('RevitJoin')">📖 Hướng dẫn</button>
+        </div>
+    </div>
+
+    <div id="section-su" class="section-header" style="color: #d16d00;">
+        <span class="section-icon">🏠</span> PLUGIN SKETCHUP
+    </div>
+
+    <div class="lisp-item type-su">
+        <div class="lisp-title">MakeFace - Tạo mặt nhanh</div>
+        <div class="lisp-desc">Tự động tạo mặt (Face) từ các cạnh khép kín.</div>
+        <div class="btn-group">
+            <button class="download-btn" onclick="checkPassAndDownload('MakeFace.rbz')">⬇ Tải về</button>
+            <button class="copy-btn" onclick="copyLink('MakeFace.rbz')">🔗 Copy Link</button>
+            <button class="guide-btn" onclick="openGuide('MakeFace')">📖 Hướng dẫn</button>
         </div>
     </div>
 
@@ -125,85 +163,64 @@
 </div>
 
 <script>
-    // 1. CẤU HÌNH MẬT KHẨU (BASE64)
-    // Hiện tại là "123" (MTIz). Hãy thay bằng mã của bạn.
-    const ENCRYPTED_PASS = "aG9hbmdsYW1AMTk5Ng=="; 
-    
-    // 2. NỘI DUNG HƯỚNG DẪN
+    // --- CẤU HÌNH ---
+    const ENCRYPTED_PASS = "SG9hbmdsYW1AMTk5Ng=="; // Pass: 123 (Sửa lại theo ý bạn)
+
+    // NỘI DUNG HƯỚNG DẪN
     const guides = {
-        'TL': `
-            <b>Lệnh tắt:</b> <span class="cmd-highlight">TL</span><br><br>
-            1. Gõ lệnh TL > Enter.<br>
-            2. Quét chọn các đối tượng cần đo.<br>
-            3. Xem kết quả tổng chiều dài trên bảng thông báo.
+        'TL': `<b>Lệnh tắt:</b> TL<br>Quét chọn đối tượng để tính tổng chiều dài.`,
+        'CB': `<b>Lệnh tắt:</b> CB<br>Quét chọn vùng để đếm Block.`,
+        'TC2I': `<b>Lệnh tắt:</b> TC2I<br>Tự động chuyển màu layer về Index.`,
+        
+        // Hướng dẫn cho Revit (Ví dụ)
+        'RevitJoin': `
+            <b>Cách cài đặt:</b><br>
+            1. Tải file .zip về và giải nén.<br>
+            2. Copy vào thư mục Addins của Revit.<br>
+            3. Mở Revit > Tab Add-ins > Chọn Tool.
         `,
-        'CB': `
-            <b>Lệnh tắt:</b> <span class="cmd-highlight">CB</span><br><br>
-            1. Gõ lệnh CB.<br>
-            2. Quét chọn vùng cần đếm Block.<br>
-            3. Xem bảng thống kê số lượng.
-        `,
-        'TC2I': `
-            <b>Lệnh tắt:</b> <span class="cmd-highlight">TC2I</span><br><br>
-            1. Gõ lệnh TC2I.<br>
-            2. Lisp tự động chuyển toàn bộ Layer màu TrueColor về Index Color (256 màu).
+        // Hướng dẫn cho SketchUp (Ví dụ)
+        'MakeFace': `
+            <b>Cách cài đặt:</b><br>
+            1. Mở SketchUp > Window > Extension Manager.<br>
+            2. Bấm "Install Extension" và chọn file .rbz vừa tải.<br>
+            3. Tool sẽ hiện trong menu Extensions.
         `
     };
 
+    // --- LOGIC XỬ LÝ (KHÔNG CẦN SỬA) ---
     function openGuide(key) {
-        var modal = document.getElementById("guideModal");
-        var title = document.getElementById("modalTitle");
-        var body = document.getElementById("modalBody");
-        title.innerText = "Hướng dẫn sử dụng: " + key;
-        body.innerHTML = guides[key] ? guides[key] : "Đang cập nhật...";
-        modal.style.display = "block";
+        document.getElementById("modalTitle").innerText = "Hướng dẫn: " + key;
+        document.getElementById("modalBody").innerHTML = guides[key] ? guides[key] : "Đang cập nhật...";
+        document.getElementById("guideModal").style.display = "block";
     }
-
-    function closeModal() {
-        document.getElementById("guideModal").style.display = "none";
-    }
-
-    window.onclick = function(event) {
-        if (event.target == document.getElementById("guideModal")) {
-            closeModal();
-        }
-    }
+    function closeModal() { document.getElementById("guideModal").style.display = "none"; }
+    window.onclick = function(e) { if(e.target == document.getElementById("guideModal")) closeModal(); }
 
     function checkPassAndDownload(filename) {
-        var inputPass = prompt("🔑 Vui lòng nhập mật khẩu để tải file " + filename + ":");
+        var inputPass = prompt("🔑 Nhập mật khẩu để tải " + filename + ":");
         if (inputPass != null) {
             try {
                 if (btoa(inputPass) === ENCRYPTED_PASS) {
-                    var link = document.createElement("a");
-                    link.href = filename;
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else { alert("❌ Mật khẩu không đúng!"); }
-            } catch (e) { alert("❌ Mật khẩu không đúng!"); }
+                    var link = document.createElement("a"); link.href = filename; link.download = filename;
+                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                } else { alert("❌ Sai mật khẩu!"); }
+            } catch(e) { alert("❌ Sai mật khẩu!"); }
         }
     }
 
     function filterLisp() {
-        var input = document.getElementById('search');
-        var filter = input.value.toUpperCase();
+        var filter = document.getElementById('search').value.toUpperCase();
         var items = document.getElementsByClassName('lisp-item');
         for (var i = 0; i < items.length; i++) {
-            var txtValue = items[i].textContent || items[i].innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                items[i].style.display = "";
-            } else { items[i].style.display = "none"; }
+            var txt = items[i].textContent || items[i].innerText;
+            items[i].style.display = txt.toUpperCase().indexOf(filter) > -1 ? "" : "none";
         }
     }
     
     function copyLink(filename) {
-        var currentUrl = window.location.href.replace('index.html', '');
-        if (currentUrl.endsWith('/')) { currentUrl = currentUrl.slice(0, -1); }
-        var fullLink = currentUrl + '/' + filename;
-        navigator.clipboard.writeText(fullLink).then(function() {
-            alert("Đã copy link tải: " + filename);
-        }, function(err) {});
+        var url = window.location.href.replace('index.html', '').replace(/\/$/, '') + '/' + filename;
+        navigator.clipboard.writeText(url).then(() => alert("Đã copy link: " + filename));
     }
 </script>
 
