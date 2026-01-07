@@ -12,7 +12,7 @@
         
         /* KHU VỰC NÚT ZALO */
         .zalo-section { text-align: center; margin-bottom: 30px; padding: 20px; background: #2d2d30; border-radius: 8px; border: 1px dashed #0088ff; }
-        .zalo-btn { background-color: #0068ff; color: white; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 50px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .zalo-btn { background-color: #0068ff; color: white; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 50px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; text-decoration: none;}
         .zalo-btn:hover { background-color: #0056d6; transform: scale(1.05); }
 
         .search-box { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 5px; border: none; font-size: 16px; box-sizing: border-box; outline: none;}
@@ -37,12 +37,13 @@
 
     <div class="zalo-section">
         <p style="margin-top: 0;">🔒 File có đặt mật khẩu bảo vệ.</p>
-        <a href="https://zalo.me/0944699619" target="_blank" class="zalo-btn">
-            💬 Nhắn Zalo lấy Mật Khẩu
+        
+        <a href="zalo://conversation?phone=84944699619" class="zalo-btn">
+            💬 Mở Zalo Chat Ngay
         </a>
-    </div>
+        </div>
 
-    <input type="text" id="search" class="search-box" placeholder="🔍 Tìm kiếm lisp..." onkeyup="filterLisp()">
+    <input type="text" id="search" class="search-box" placeholder="🔍 Tìm kiếm (ví dụ: khung tên, màu, đếm...)" onkeyup="filterLisp()">
 
     <div class="lisp-item">
         <div class="lisp-title">TL - Tính tổng chiều dài</div>
@@ -83,24 +84,29 @@
 </div>
 
 <script>
-    // --- CẤU HÌNH MẬT KHẨU TẠI ĐÂY ---
-    const SITE_PASSWORD = "Hoanglam@1996"; // Bạn hãy sửa số 123 thành mật khẩu bạn muốn
-    // ---------------------------------
+    // --- CẤU HÌNH MẬT KHẨU (ĐÃ MÃ HÓA) ---
+    
+    const ENCRYPTED_PASS = "SG9hbmdsYW1AMTk5Ng=="; 
+    // -------------------------------------
 
     function checkPassAndDownload(filename) {
-        var inputPass = prompt("Vui lòng nhập mật khẩu để tải file " + filename + ":");
+        var inputPass = prompt("🔑 Vui lòng nhập mật khẩu để tải file " + filename + ":");
         
-        if (inputPass === SITE_PASSWORD) {
-            // Nếu đúng mật khẩu thì tạo link tải
-            var link = document.createElement("a");
-            link.href = filename;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } else if (inputPass != null) {
-            // Nếu sai mật khẩu (và không phải do bấm Cancel)
-            alert("❌ Mật khẩu không đúng! Vui lòng liên hệ Zalo để lấy pass.");
+        if (inputPass != null) {
+            try {
+                if (btoa(inputPass) === ENCRYPTED_PASS) {
+                    var link = document.createElement("a");
+                    link.href = filename;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert("❌ Mật khẩu không đúng!");
+                }
+            } catch (e) {
+                alert("❌ Mật khẩu không đúng!");
+            }
         }
     }
 
@@ -125,7 +131,7 @@
         var fullLink = baseUrl + '/' + filename;
         
         navigator.clipboard.writeText(fullLink).then(function() {
-            alert("Đã copy link: " + filename + "\n(Lưu ý: Link này gửi cho người khác vẫn cần mật khẩu hoặc họ phải vào web để tải)");
+            alert("Đã copy link tải: " + filename);
         }, function(err) {
             alert("Lỗi copy link.");
         });
