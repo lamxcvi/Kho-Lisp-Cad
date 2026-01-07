@@ -21,12 +21,23 @@
         .lisp-desc { font-style: italic; color: #808080; margin: 5px 0; }
         .btn-group { margin-top: 10px; }
         
-        /* Button Style */
-        button { text-decoration: none; border-radius: 4px; border: none; cursor: pointer; display: inline-block; font-size: 14px; margin-right: 5px; margin-bottom: 5px; padding: 8px 15px; color: white;}
-        .download-btn { background: #0e639c; }
+        /* STYLE CHO CÁC NÚT BẤM */
+        button { text-decoration: none; border-radius: 4px; border: none; cursor: pointer; display: inline-block; font-size: 13px; margin-right: 5px; margin-bottom: 5px; padding: 8px 12px; color: white; font-weight: 500;}
+        .download-btn { background: #0e639c; } /* Xanh dương */
         .download-btn:hover { background: #1177bb; }
-        .copy-btn { background: #4caf50; }
+        .copy-btn { background: #4caf50; } /* Xanh lá */
         .copy-btn:hover { background: #45a049; }
+        .guide-btn { background: #d16d00; } /* Màu Cam cho nút Hướng dẫn */
+        .guide-btn:hover { background: #e67e00; }
+
+        /* STYLE CHO POPUP HƯỚNG DẪN (MODAL) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); }
+        .modal-content { background-color: #252526; margin: 15% auto; padding: 20px; border: 1px solid #ce9178; width: 80%; max-width: 500px; border-radius: 8px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover, .close:focus { color: #fff; text-decoration: none; cursor: pointer; }
+        .modal-header { font-size: 1.2em; color: #ce9178; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;}
+        .modal-body { line-height: 1.6; font-size: 15px;}
+        .cmd-highlight { background: #444; padding: 2px 6px; border-radius: 3px; color: #4ec9b0; font-family: monospace; }
     </style>
 </head>
 <body>
@@ -37,61 +48,125 @@
 
     <div class="zalo-section">
         <p style="margin-top: 0;">🔒 File có đặt mật khẩu bảo vệ.</p>
-        
         <a href="zalo://conversation?phone=84944699619" class="zalo-btn">
             💬 Mở Zalo Chat Ngay
         </a>
-        </div>
+    </div>
 
-    <input type="text" id="search" class="search-box" placeholder="🔍 Tìm kiếm (ví dụ: khung tên, màu, đếm...)" onkeyup="filterLisp()">
+    <input type="text" id="search" class="search-box" placeholder="🔍 Tìm kiếm..." onkeyup="filterLisp()">
 
     <div class="lisp-item">
         <div class="lisp-title">TL - Tính tổng chiều dài</div>
-        <div class="lisp-desc">Tính tổng chiều dài các đường Line, Pline, Arc... dùng để bốc khối lượng dây, ống.</div>
+        <div class="lisp-desc">Tính tổng chiều dài các đường Line, Pline, Arc...</div>
         <div class="btn-group">
-            <button class="download-btn" onclick="checkPassAndDownload('TL.lsp')">⬇ Tải về (.lsp)</button>
+            <button class="download-btn" onclick="checkPassAndDownload('TL.lsp')">⬇ Tải về</button>
             <button class="copy-btn" onclick="copyLink('TL.lsp')">🔗 Copy Link</button>
+            <button class="guide-btn" onclick="openGuide('TL')">📖 Hướng dẫn</button>
         </div>
     </div>
 
     <div class="lisp-item">
         <div class="lisp-title">CB - Đếm số lượng Block</div>
-        <div class="lisp-desc">Thống kê số lượng Block (ổ cắm, đèn, thiết bị) và xuất bảng tổng hợp.</div>
+        <div class="lisp-desc">Thống kê số lượng Block và xuất bảng tổng hợp.</div>
         <div class="btn-group">
-            <button class="download-btn" onclick="checkPassAndDownload('CB.lsp')">⬇ Tải về (.lsp)</button>
+            <button class="download-btn" onclick="checkPassAndDownload('CB.lsp')">⬇ Tải về</button>
             <button class="copy-btn" onclick="copyLink('CB.lsp')">🔗 Copy Link</button>
+            <button class="guide-btn" onclick="openGuide('CB')">📖 Hướng dẫn</button>
         </div>
     </div>
 
     <div class="lisp-item">
-        <div class="lisp-title">TC2I - Chuyển màu TrueColor sang Index</div>
-        <div class="lisp-desc">Chuyển đổi toàn bộ màu Layer từ hệ TrueColor (RGB) sang Index Color (256 màu) để sửa lỗi in ấn.</div>
+        <div class="lisp-title">TC2I - Chuyển màu TrueColor</div>
+        <div class="lisp-desc">Chuyển đổi màu TrueColor sang Index Color để in ấn.</div>
         <div class="btn-group">
-            <button class="download-btn" onclick="checkPassAndDownload('TC2I.lsp')">⬇ Tải về (.lsp)</button>
+            <button class="download-btn" onclick="checkPassAndDownload('TC2I.lsp')">⬇ Tải về</button>
             <button class="copy-btn" onclick="copyLink('TC2I.lsp')">🔗 Copy Link</button>
+            <button class="guide-btn" onclick="openGuide('TC2I')">📖 Hướng dẫn</button>
         </div>
     </div>
 
     <div class="lisp-item">
         <div class="lisp-title">UpdateTitleBlock - Cập nhật khung tên</div>
-        <div class="lisp-desc">Tự động cập nhật thông tin, ngày tháng, tên bản vẽ cho Block khung tên hàng loạt.</div>
+        <div class="lisp-desc">Tự động điền thông tin Block khung tên hàng loạt.</div>
         <div class="btn-group">
-            <button class="download-btn" onclick="checkPassAndDownload('UpdateTitleBlock.lsp')">⬇ Tải về (.lsp)</button>
+            <button class="download-btn" onclick="checkPassAndDownload('UpdateTitleBlock.lsp')">⬇ Tải về</button>
             <button class="copy-btn" onclick="copyLink('UpdateTitleBlock.lsp')">🔗 Copy Link</button>
+            <button class="guide-btn" onclick="openGuide('UpdateTitleBlock')">📖 Hướng dẫn</button>
         </div>
     </div>
 
 </div>
 
+<div id="guideModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="modalTitle" class="modal-header">Tiêu đề hướng dẫn</div>
+        <div id="modalBody" class="modal-body">Nội dung...</div>
+    </div>
+</div>
+
 <script>
-    // --- CẤU HÌNH MẬT KHẨU (ĐÃ MÃ HÓA) ---
+    // 1. CẤU HÌNH MẬT KHẨU (ĐÃ MÃ HÓA BASE64)
+    const ENCRYPTED_PASS = "SG9hbmdsYW1AMTk5Ng=="; // Mặc định là ...
     
-    const ENCRYPTED_PASS = "SG9hbmdsYW1AMTk5Ng=="; 
-    // -------------------------------------
+    // 2. NỘI DUNG HƯỚNG DẪN (BẠN SỬA LỜI VĂN Ở ĐÂY)
+    const guides = {
+        'TL': `
+            <b>Lệnh tắt:</b> <span class="cmd-highlight">TL</span><br><br>
+            1. Gõ lệnh TL và nhấn Enter.<br>
+            2. Quét chọn các đối tượng cần đo (Line, Pline, Arc...).<br>
+            3. Kết quả tổng chiều dài sẽ hiện ra bảng thông báo.
+        `,
+        'CB': `
+            <b>Lệnh tắt:</b> <span class="cmd-highlight">CB</span><br><br>
+            1. Gõ lệnh CB.<br>
+            2. Quét chọn vùng bản vẽ chứa các Block cần đếm.<br>
+            3. Danh sách tên Block và số lượng sẽ hiện ra.
+        `,
+        'TC2I': `
+            <b>Lệnh tắt:</b> <span class="cmd-highlight">TC2I</span><br><br>
+            1. Gõ lệnh TC2I.<br>
+            2. Lisp sẽ tự động tìm các Layer có màu TrueColor (RGB) và chuyển về màu Index gần nhất.<br>
+            3. Giúp sửa lỗi in bị mờ nét.
+        `,
+        'UpdateTitleBlock': `
+            <b>Lệnh tắt:</b> <span class="cmd-highlight">UTB</span> (hoặc tên lệnh bạn đặt)<br><br>
+            1. Mở bản vẽ cần cập nhật.<br>
+            2. Chạy Lisp và nhập thông tin ngày tháng/tên người vẽ.<br>
+            3. Lisp tự động update toàn bộ khung tên.
+        `
+    };
+
+    // --- CÁC HÀM XỬ LÝ (KHÔNG CẦN SỬA) ---
+
+    function openGuide(key) {
+        var modal = document.getElementById("guideModal");
+        var title = document.getElementById("modalTitle");
+        var body = document.getElementById("modalBody");
+        
+        // Lấy tên Lisp làm tiêu đề
+        title.innerText = "Hướng dẫn sử dụng: " + key;
+        
+        // Lấy nội dung từ danh sách guides, nếu không có thì báo đang cập nhật
+        body.innerHTML = guides[key] ? guides[key] : "Đang cập nhật hướng dẫn...";
+        
+        modal.style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("guideModal").style.display = "none";
+    }
+
+    // Đóng popup khi bấm ra ngoài vùng trắng
+    window.onclick = function(event) {
+        var modal = document.getElementById("guideModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
 
     function checkPassAndDownload(filename) {
         var inputPass = prompt("🔑 Vui lòng nhập mật khẩu để tải file " + filename + ":");
-        
         if (inputPass != null) {
             try {
                 if (btoa(inputPass) === ENCRYPTED_PASS) {
@@ -104,9 +179,7 @@
                 } else {
                     alert("❌ Mật khẩu không đúng!");
                 }
-            } catch (e) {
-                alert("❌ Mật khẩu không đúng!");
-            }
+            } catch (e) { alert("❌ Mật khẩu không đúng!"); }
         }
     }
 
@@ -118,9 +191,7 @@
             var txtValue = items[i].textContent || items[i].innerText;
             if (txtValue.toUpperCase().indexOf(filter) > -1) {
                 items[i].style.display = "";
-            } else {
-                items[i].style.display = "none";
-            }
+            } else { items[i].style.display = "none"; }
         }
     }
     
@@ -129,12 +200,9 @@
         var baseUrl = currentUrl.replace('index.html', '');
         if (baseUrl.endsWith('/')) { baseUrl = baseUrl.slice(0, -1); }
         var fullLink = baseUrl + '/' + filename;
-        
         navigator.clipboard.writeText(fullLink).then(function() {
             alert("Đã copy link tải: " + filename);
-        }, function(err) {
-            alert("Lỗi copy link.");
-        });
+        }, function(err) {});
     }
 </script>
 
