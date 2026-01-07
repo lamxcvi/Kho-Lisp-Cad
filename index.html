@@ -176,18 +176,37 @@
     // --- CẤU HÌNH ---
     const ENCRYPTED_PASS = "SG9hbmdsYW1AMTk5Ng=="; // Pass: 123 (Sửa lại theo ý bạn)
 
-    // NỘI DUNG HƯỚNG DẪN
+   // 2. NỘI DUNG HƯỚNG DẪN (ĐÃ CẬP NHẬT ĐỒNG BỘ)
     const guides = {
-        'TL': `<b>Lệnh tắt:</b> TL<br>Quét chọn đối tượng để tính tổng chiều dài.`,
-        'CB': `<b>Lệnh tắt:</b> CB<br>Quét chọn vùng để đếm Block.`,
-        'TC2I': `<b>Lệnh tắt:</b> TC2I<br>Tự động chuyển màu layer về Index.`,
+        'TL': `
+            <b>Lệnh tắt:</b> <span class="cmd-highlight">TL</span><br><br>
+            1. Gõ lệnh TL > Enter.<br>
+            2. Quét chọn các đối tượng (Line, Pline, Arc...).<br>
+            3. Kết quả tổng chiều dài sẽ hiện ra trong bảng thông báo.<br>
+            <i>Dùng để bốc khối lượng dây điện, đường ống nước, nẹp chỉ...</i>
+        `,
+        'CB': `
+            <b>Lệnh tắt:</b> <span class="cmd-highlight">CB</span><br><br>
+            1. Gõ lệnh CB > Enter.<br>
+            2. Quét chọn vùng bản vẽ cần đếm.<br>
+            3. Xem bảng thống kê tên và số lượng từng loại Block.<br>
+            <i>Dùng để đếm thiết bị, ổ cắm, đèn, nội thất cực nhanh.</i>
+        `,
+        'TC2I': `
+            <b>Lệnh tắt:</b> <span class="cmd-highlight">TC2I</span><br><br>
+            1. Gõ lệnh TC2I > Enter.<br>
+            2. Lisp tự động quét toàn bộ Layer và chuyển màu TrueColor (RGB) về Index.<br>
+            3. Thông báo hoàn tất hiện ra.<br>
+            <i>Khắc phục lỗi in ấn bị mờ hoặc sai nét do đặt nhầm hệ màu RGB.</i>
+        `,
         'FixBlk': `
             <b>Lệnh tắt:</b> <span class="cmd-highlight">FIXBLK</span><br><br>
-            1. Gõ lệnh FIXBLK.<br>
-            2. Quét chọn các Block cần sửa.<br>
-            3. Lisp sẽ chui vào bên trong Block, đưa tất cả nét về <b>Layer 0</b> và màu <b>ByBlock</b>.<br>
+            1. Gõ lệnh FIXBLK > Enter.<br>
+            2. Quét chọn các Block cần chuẩn hóa.<br>
+            3. Lisp tự động chui vào trong Block, đưa tất cả về <b>Layer 0</b> và màu <b>ByBlock</b>.<br>
             <i>Lưu ý: Tất cả Block cùng tên trong bản vẽ đều sẽ thay đổi theo.</i>
-        `,
+        `
+        // Nếu có tool Revit/SketchUp thì thêm tiếp vào dưới đây...
         // Hướng dẫn cho Revit (Ví dụ)
         'RevitJoin': `
             <b>Cách cài đặt:</b><br>
