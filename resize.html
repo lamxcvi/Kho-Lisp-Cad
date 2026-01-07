@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Resize Ảnh Nhanh</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { color: #4ec9b0; margin-top: 0; }
+        
+        /* Input Styles */
+        .control-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 5px; color: #ce9178; font-weight: bold; }
+        input[type="number"], input[type="file"] { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #555; background: #333; color: white; box-sizing: border-box; }
+        input[type="range"] { width: 100%; }
+        
+        /* Grid cho kích thước */
+        .size-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        /* Buttons */
+        .btn { border: none; padding: 12px 25px; border-radius: 5px; font-size: 16px; cursor: pointer; color: white; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.3s; }
+        .btn-resize { background-color: #0e639c; }
+        .btn-resize:hover { background-color: #1177bb; }
+        .btn-download { background-color: #4caf50; display: none; text-decoration: none; display: inline-block; box-sizing: border-box;}
+        .btn-download:hover { background-color: #45a049; }
+        .btn-back { background-color: #444; margin-bottom: 20px; width: auto; display: inline-block; padding: 8px 15px; font-size: 14px;}
+
+        /* Preview Image */
+        #previewContainer { margin-top: 20px; border: 2px dashed #444; min-height: 150px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;}
+        img { max-width: 100%; display: none; }
+        .info-text { font-size: 14px; color: #888; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn btn-back">⬅ Quay lại Trang chủ</a>
+
+    <div class="container">
+        <h1>🖼️ CÔNG CỤ RESIZE ẢNH</h1>
+        
+        <div class="control-group">
+            <label>1. Chọn ảnh cần sửa:</label>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <div class="size-grid">
+            <div class="control-group">
+                <label>Chiều Rộng (px):</label>
+                <input type="number" id="widthInput" placeholder="Ví dụ: 1920">
+            </div>
+            <div class="control-group">
+                <label>Chiều Cao (px):</label>
+                <input type="number" id="heightInput" placeholder="Tự động tính">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>Chất lượng ảnh (Nén): <span id="qualityVal">90%</span></label>
+            <input type="range" id="qualityInput" min="0.1" max="1.0" step="0.1" value="0.9">
+        </div>
+
+        <button class="btn btn-resize" onclick="resizeImage()">⚡ RESIZE NGAY</button>
+
+        <div id="previewContainer">
+            <p id="placeholderText" style="color: #666;">Ảnh xem trước sẽ hiện ở đây</p>
+            <img id="previewImg" alt="Preview">
+        </div>
+        <p id="sizeInfo" class="info-text"></p>
+
+        <a id="downloadLink" class="btn btn-download" style="display: none;">⬇ TẢI ẢNH VỀ MÁY</a>
+    </div>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        const qualityInput = document.getElementById('qualityInput');
+        const previewImg = document.getElementById('previewImg');
+        const downloadLink = document.getElementById('downloadLink');
+        const qualityVal = document.getElementById('qualityVal');
+        
+        let originalImage = new Image();
+        let originalWidth = 0;
+        let originalHeight = 0;
+
+        // Xử lý khi chọn ảnh
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    originalImage.src = event.target.result;
+                    originalImage.onload = function() {
+                        originalWidth = originalImage.width;
+                        originalHeight = originalImage.height;
+                        
+                        // Hiển thị thông số gốc
+                        widthInput.value = originalWidth;
+                        heightInput.value = originalHeight;
+                        
+                        // Hiện ảnh gốc
+                        previewImg.src = originalImage.src;
+                        previewImg.style.display = 'block';
+                        document.getElementById('placeholderText').style.display = 'none';
+                        downloadLink.style.display = 'none'; // Ẩn nút tải cũ đi
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Tự động tính chiều cao khi nhập chiều rộng (Giữ tỉ lệ)
+        widthInput.addEventListener('input', function() {
+            if (originalWidth > 0) {
+                const ratio = originalHeight / originalWidth;
+                heightInput.value = Math.round(this.value * ratio);
+            }
+        });
+
+        // Hiển thị % chất lượng
+        qualityInput.addEventListener('input', function() {
+            qualityVal.innerText = Math.round(this.value * 100) + "%";
+        });
+
+        function resizeImage() {
+            if (!originalImage.src) {
+                alert("Vui lòng chọn ảnh trước!");
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const newWidth = parseInt(widthInput.value);
+            const newHeight = parseInt(heightInput.value);
+            const quality = parseFloat(qualityInput.value);
+
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+
+            // Vẽ ảnh lên canvas với kích thước mới
+            ctx.drawImage(originalImage, 0, 0, newWidth, newHeight);
+
+            // Xuất ảnh ra DataURL
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            
+            // Cập nhật giao diện
+            previewImg.src = dataUrl;
+            
+            // Cập nhật nút Download
+            downloadLink.href = dataUrl;
+            downloadLink.download = 'anh-da-resize.jpg';
+            downloadLink.style.display = 'block';
+            downloadLink.innerText = "⬇ TẢI VỀ (" + newWidth + "x" + newHeight + ")";
+            
+            document.getElementById('sizeInfo').innerText = "Đã resize xong! Nhấn nút tải về bên dưới.";
+        }
+    </script>
+</body>
+</html>
