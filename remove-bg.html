@@ -31,7 +31,7 @@
         .img-box img { max-width: 100%; max-height: 400px; display: block; }
         .img-label { margin-bottom: 10px; color: #888; font-style: italic; }
         
-        /* Background caro cho ảnh kết quả để thấy độ trong suốt */
+        /* Background caro */
         .transparent-bg {
             background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%);
             background-size: 20px 20px;
@@ -40,10 +40,13 @@
 
         /* Loading */
         #loading { display: none; margin-top: 20px; color: #569cd6; font-weight: bold; }
+        #loadingText { font-size: 14px; color: #aaa; margin-top: 5px; }
         .spinner { border: 4px solid #333; border-top: 4px solid #569cd6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Responsive Mobile */
+        /* Error Message */
+        #errorMsg { display: none; color: #ff5555; background: rgba(255, 85, 85, 0.1); padding: 10px; border-radius: 5px; margin-top: 15px; border: 1px solid #ff5555; text-align: left; font-size: 14px;}
+
         @media (max-width: 600px) { .result-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -52,8 +55,8 @@
     <a href="index.html" class="btn btn-back">⬅ Quay lại Trang chủ</a>
 
     <div class="container">
-        <h1>✨ AI XÓA PHÔNG NỀN</h1>
-        <p style="color: #888; font-size: 0.9em;">Chạy trực tiếp trên trình duyệt - Miễn phí - Không giới hạn</p>
+        <h1>✨ AI XÓA PHÔNG NỀN (V2)</h1>
+        <p style="color: #888; font-size: 0.9em;">Phiên bản đã sửa lỗi tải Model</p>
 
         <div class="control-group">
             <label>1. Chọn ảnh cần tách nền:</label>
@@ -64,8 +67,11 @@
         
         <div id="loading">
             <div class="spinner"></div>
-            <p>Đang tải AI Model & Xử lý...<br>(Lần đầu có thể mất 10-20 giây)</p>
+            <p>Đang xử lý... <br>Lần đầu sẽ tải khoảng 20MB dữ liệu AI.</p>
+            <p id="loadingText">Vui lòng đợi...</p>
         </div>
+
+        <div id="errorMsg"></div>
 
         <div class="result-grid" id="resultGrid">
             <div class="img-box">
@@ -73,73 +79,80 @@
                 <img id="originalImg" alt="Original">
             </div>
             <div class="img-box transparent-bg">
-                <span class="img-label">Kết quả (Đã tách nền)</span>
+                <span class="img-label">Kết quả</span>
                 <img id="resultImg" alt="Result">
             </div>
         </div>
 
-        <a id="downloadLink" class="btn btn-download">⬇ TẢI ẢNH PNG (Trong suốt)</a>
+        <a id="downloadLink" class="btn btn-download">⬇ TẢI ẢNH PNG</a>
     </div>
 
     <script type="module">
-        // Import thư viện AI từ CDN (Không cần cài đặt)
         import removeBackground from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.4/+esm";
 
         const imageInput = document.getElementById('imageInput');
         const processBtn = document.getElementById('processBtn');
         const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
         const resultGrid = document.getElementById('resultGrid');
         const originalImg = document.getElementById('originalImg');
         const resultImg = document.getElementById('resultImg');
         const downloadLink = document.getElementById('downloadLink');
+        const errorMsg = document.getElementById('errorMsg');
 
         let selectedFile = null;
 
-        // Xử lý khi chọn file
         imageInput.addEventListener('change', (e) => {
             selectedFile = e.target.files[0];
             if (selectedFile) {
                 const url = URL.createObjectURL(selectedFile);
                 originalImg.src = url;
-                resultGrid.style.display = "grid"; // Hiện khung nhưng chưa có kết quả
-                resultImg.src = ""; // Xóa kết quả cũ
+                resultGrid.style.display = "grid";
+                resultImg.src = "";
                 downloadLink.style.display = "none";
+                errorMsg.style.display = "none";
             }
         });
 
-        // Hàm xử lý chính (Được gọi từ nút bấm, nhưng cần gán vào window vì module scope)
         window.processImage = async function() {
             if (!selectedFile) {
                 alert("Vui lòng chọn ảnh trước!");
                 return;
             }
 
-            // Giao diện đang xử lý
             processBtn.disabled = true;
-            processBtn.innerText = "⏳ Đang xử lý...";
             loading.style.display = "block";
+            errorMsg.style.display = "none";
             downloadLink.style.display = "none";
+            loadingText.innerText = "Đang kết nối server để tải bộ não AI (sẽ mất khoảng 15-30 giây)...";
 
             try {
-                // GỌI AI ĐỂ XÓA NỀN
-                const imageBlob = await removeBackground(selectedFile);
-                
-                // Hiển thị kết quả
+                // CẤU HÌNH QUAN TRỌNG: Ép buộc tải tài nguyên từ CDN công cộng thay vì tải từ thư mục local
+                const config = {
+                    publicPath: "https://static.imgly.com/lib/background-removal/v1.0.4/dist/", 
+                    debug: true, // Bật chế độ debug để xem lỗi nếu có
+                    progress: (key, current, total) => {
+                        // Hiển thị tiến trình tải
+                        const percent = Math.round((current / total) * 100);
+                        loadingText.innerText = `Đang tải dữ liệu: ${key} (${percent}%)`;
+                    }
+                };
+
+                const imageBlob = await removeBackground(selectedFile, config);
                 const url = URL.createObjectURL(imageBlob);
-                resultImg.src = url;
                 
-                // Setup nút tải về
+                resultImg.src = url;
                 downloadLink.href = url;
-                downloadLink.download = "no-bg-" + selectedFile.name.replace(/\.[^/.]+$/, "") + ".png";
+                downloadLink.download = "Da-Xoa-Nen.png";
                 downloadLink.style.display = "inline-block";
+                loadingText.innerText = "Hoàn tất!";
 
             } catch (error) {
                 console.error(error);
-                alert("Có lỗi xảy ra! Có thể ảnh quá lớn hoặc trình duyệt không hỗ trợ.");
+                errorMsg.style.display = "block";
+                errorMsg.innerHTML = "❌ <b>Lỗi xử lý:</b> " + error.message + "<br><br>Gợi ý: Hãy thử dùng trình duyệt Chrome/Edge và đảm bảo kết nối mạng ổn định để tải AI Model.";
             } finally {
-                // Khôi phục giao diện
                 processBtn.disabled = false;
-                processBtn.innerText = "🚀 BẮT ĐẦU TÁCH NỀN";
                 loading.style.display = "none";
             }
         };
