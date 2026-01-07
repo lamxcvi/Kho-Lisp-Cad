@@ -8,12 +8,12 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; }
         h1 { color: #4ec9b0; text-align: center; }
-        .search-box { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: none; font-size: 16px; }
+        .search-box { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: none; font-size: 16px; box-sizing: border-box; }
         .lisp-item { background-color: #252526; padding: 15px; margin-bottom: 15px; border-left: 5px solid #ce9178; border-radius: 4px; }
         .lisp-title { font-size: 1.2em; font-weight: bold; color: #9cdcfe; }
         .lisp-desc { font-style: italic; color: #808080; margin: 5px 0; }
         .btn-group { margin-top: 10px; }
-        a, button { text-decoration: none; background: #0e639c; color: white; padding: 8px 15px; border-radius: 4px; border: none; cursor: pointer; display: inline-block; font-size: 14px; margin-right: 5px;}
+        a, button { text-decoration: none; background: #0e639c; color: white; padding: 8px 15px; border-radius: 4px; border: none; cursor: pointer; display: inline-block; font-size: 14px; margin-right: 5px; margin-bottom: 5px;}
         a:hover, button:hover { background: #1177bb; }
         .copy-btn { background: #4caf50; }
         .copy-btn:hover { background: #45a049; }
@@ -22,28 +22,46 @@
 <body>
 
 <div class="container">
-    <h1>📚 KHO LISP XÂY DỰNG</h1>
-    <input type="text" id="search" class="search-box" placeholder="Tìm kiếm Lisp (ví dụ: đo chiều dài, đếm block...)" onkeyup="filterLisp()">
+    <h1>📚 KHO LISP CỦA TÔI</h1>
+    <input type="text" id="search" class="search-box" placeholder="🔍 Tìm kiếm (ví dụ: khung tên, màu, đếm, đo...)" onkeyup="filterLisp()">
 
     <div class="lisp-item">
         <div class="lisp-title">TL - Tính tổng chiều dài</div>
-        <div class="lisp-desc">Tính tổng chiều dài các đường Line, Pline, Arc... dùng để bốc dây điện, ống nước.</div>
+        <div class="lisp-desc">Tính tổng chiều dài các đường Line, Pline, Arc... dùng để bốc khối lượng dây, ống.</div>
         <div class="btn-group">
             <a href="TL.lsp" download>⬇ Tải về (.lsp)</a>
-            <button class="copy-btn" onclick="copyLink('TL.lsp')">🔗 Copy Link Tải</button>
+            <button class="copy-btn" onclick="copyLink('TL.lsp')">🔗 Copy Link</button>
         </div>
     </div>
 
     <div class="lisp-item">
         <div class="lisp-title">CB - Đếm số lượng Block</div>
-        <div class="lisp-desc">Thống kê số lượng Block (ổ cắm, đèn, thiết bị) và hiện bảng tổng hợp.</div>
+        <div class="lisp-desc">Thống kê số lượng Block (ổ cắm, đèn, thiết bị) và xuất bảng tổng hợp.</div>
         <div class="btn-group">
             <a href="CB.lsp" download>⬇ Tải về (.lsp)</a>
-            <button class="copy-btn" onclick="copyLink('CB.lsp')">🔗 Copy Link Tải</button>
+            <button class="copy-btn" onclick="copyLink('CB.lsp')">🔗 Copy Link</button>
         </div>
     </div>
 
+    <div class="lisp-item">
+        <div class="lisp-title">TC2I - Chuyển màu TrueColor sang Index</div>
+        <div class="lisp-desc">Chuyển đổi toàn bộ màu Layer từ hệ TrueColor (RGB) sang Index Color (256 màu) để sửa lỗi in ấn theo nét (CTB).</div>
+        <div class="btn-group">
+            <a href="TC2I.lsp" download>⬇ Tải về (.lsp)</a>
+            <button class="copy-btn" onclick="copyLink('TC2I.lsp')">🔗 Copy Link</button>
+        </div>
     </div>
+
+    <div class="lisp-item">
+        <div class="lisp-title">UpdateTitleBlock - Cập nhật khung tên</div>
+        <div class="lisp-desc">Tự động cập nhật thông tin, ngày tháng, tên bản vẽ cho Block khung tên hàng loạt.</div>
+        <div class="btn-group">
+            <a href="UpdateTitleBlock.lsp" download>⬇ Tải về (.lsp)</a>
+            <button class="copy-btn" onclick="copyLink('UpdateTitleBlock.lsp')">🔗 Copy Link</button>
+        </div>
+    </div>
+
+</div>
 
 <script>
     function filterLisp() {
@@ -60,9 +78,20 @@
         }
     }
     function copyLink(filename) {
-        var fullLink = window.location.href.replace('index.html', '') + filename;
-        navigator.clipboard.writeText(fullLink);
-        alert("Đã copy link tải: " + filename);
+        var currentUrl = window.location.href;
+        // Xóa phần index.html để lấy thư mục gốc, đảm bảo link sạch
+        var baseUrl = currentUrl.replace('index.html', '');
+        // Xóa dấu / ở cuối nếu có để tránh bị 2 dấu //
+        if (baseUrl.endsWith('/')) {
+             baseUrl = baseUrl.slice(0, -1);
+        }
+        var fullLink = baseUrl + '/' + filename;
+        
+        navigator.clipboard.writeText(fullLink).then(function() {
+            alert("Đã copy link tải: " + filename);
+        }, function(err) {
+            alert("Lỗi copy link. Bạn hãy thử chuột phải vào nút Tải về -> Copy Link Address");
+        });
     }
 </script>
 
