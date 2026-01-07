@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư Viện Kỹ Thuật Số</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        /* HEADER */
+        header { text-align: center; margin-bottom: 40px; padding-top: 20px; border-bottom: 1px solid #333; padding-bottom: 30px;}
+        h1 { color: #4ec9b0; margin: 0; font-size: 2.5em; letter-spacing: 1px; text-transform: uppercase;}
+        .subtitle { color: #888; font-style: italic; margin-top: 10px; font-size: 1.1em;}
+
+        /* GRID LAYOUT (Lưới chứa các công cụ) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Tự động chia cột */
+            gap: 20px;
+        }
+
+        /* CARD STYLE (Thẻ công cụ) */
+        .card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            text-decoration: none;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 160px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background-color: #252526;
+            border-color: #4ec9b0;
+            box-shadow: 0 5px 15px rgba(78, 201, 176, 0.2);
+        }
+
+        .icon { font-size: 3em; margin-bottom: 15px; }
+        .title { font-size: 1.2em; font-weight: bold; margin-bottom: 5px; color: #fff;}
+        .desc { font-size: 0.9em; color: #888; }
+
+        /* MÀU SẮC RIÊNG CHO TỪNG NHÓM */
+        .group-cad { border-top: 4px solid #ce9178; }
+        .group-ai { border-top: 4px solid #d16d00; }
+        .group-calc { border-top: 4px solid #4caf50; }
+        .group-util { border-top: 4px solid #569cd6; }
+
+        /* FOOTER */
+        footer { text-align: center; margin-top: 50px; color: #555; font-size: 0.9em; border-top: 1px solid #333; padding-top: 20px;}
+        
+        /* NÚT LIÊN HỆ */
+        .contact-btn {
+            display: inline-block; margin-top: 10px;
+            background: #0068ff; color: white; text-decoration: none;
+            padding: 10px 20px; border-radius: 50px; font-weight: bold; font-size: 14px;
+        }
+        .contact-btn:hover { background: #0056d6; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🏛️ THƯ VIỆN KỸ THUẬT</h1>
+        <div class="subtitle">Kho tàng công cụ & Tiện ích dành cho Kỹ sư</div>
+        <a href="zalo://conversation?phone=84909xxxxxx" class="contact-btn">💬 Liên hệ Admin (Zalo)</a>
+    </header>
+
+    <div class="grid-container">
+        
+        <a href="tools.html" class="card group-cad">
+            <div class="icon">📚</div>
+            <div class="title">KHO TÀI NGUYÊN</div>
+            <div class="desc">Lisp CAD, Add-in Revit, Plugin SketchUp</div>
+        </a>
+
+        <a href="remove-bg.html" class="card group-ai">
+            <div class="icon">✨</div>
+            <div class="title">AI XÓA PHÔNG</div>
+            <div class="desc">Tách nền ảnh tự động siêu tốc</div>
+        </a>
+
+        <a href="resize.html" class="card group-ai">
+            <div class="icon">🖼️</div>
+            <div class="title">SỬA ẢNH NHANH</div>
+            <div class="desc">Resize kích thước, giảm dung lượng</div>
+        </a>
+
+        <a href="steel.html" class="card group-calc">
+            <div class="icon">🏗️</div>
+            <div class="title">TÍNH THÉP</div>
+            <div class="desc">Tra trọng lượng & Chiều dài thép</div>
+        </a>
+
+        <a href="power.html" class="card group-calc">
+            <div class="icon">⚡</div>
+            <div class="title">TÍNH CÔNG SUẤT</div>
+            <div class="desc">Tính tải điện & Chọn dây dẫn</div>
+        </a>
+
+        <a href="stairs.html" class="card group-calc">
+            <div class="icon">📐</div>
+            <div class="title">CHIA BẬC THANG</div>
+            <div class="desc">Tính chiều cao bậc & Phong thủy</div>
+        </a>
+
+        <a href="luban.html" class="card group-util">
+            <div class="icon">📏</div>
+            <div class="title">THƯỚC LỖ BAN</div>
+            <div class="desc">Tra cứu kích thước Phong thủy</div>
+        </a>
+
+        <a href="converter.html" class="card group-util">
+            <div class="icon">🔄</div>
+            <div class="title">ĐỔI ĐƠN VỊ</div>
+            <div class="desc">Chuyển đổi đơn vị kỹ thuật quốc tế</div>
+        </a>
+
+        <a href="qrcode.html" class="card group-util">
+            <div class="icon">📱</div>
+            <div class="title">TẠO MÃ QR</div>
+            <div class="desc">Tạo mã QR Wifi, Link, Văn bản</div>
+        </a>
+
+    </div>
+
+    <footer>
+        <p>© 2024 Thư viện Kỹ thuật Số. Phát triển bởi [Tên Bạn].</p>
+    </footer>
+</div>
+
+</body>
+</html>
