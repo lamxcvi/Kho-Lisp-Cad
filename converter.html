@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyển Đổi Đơn Vị Kỹ Thuật</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { color: #4ec9b0; margin-top: 0; }
+        
+        .control-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 5px; color: #ce9178; font-weight: bold; }
+        select, input { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #555; background: #333; color: white; box-sizing: border-box; font-size: 16px; outline: none; margin-bottom: 10px;}
+        input:focus, select:focus { border-color: #4ec9b0; }
+
+        /* Khung chuyển đổi */
+        .converter-box { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 10px; 
+            background: #333; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-top: 10px;
+        }
+        
+        .unit-col { flex: 1; }
+        .arrow { font-size: 24px; color: #4ec9b0; font-weight: bold; }
+
+        .result-display {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4caf50;
+            margin-top: 20px;
+            min-height: 1.2em;
+        }
+        
+        .btn-back { background-color: #444; margin-bottom: 20px; padding: 8px 15px; font-size: 14px; display: inline-block; text-decoration: none; border-radius: 4px; color: white;}
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-back">⬅ Quay lại Trang chủ</a>
+
+    <div class="container">
+        <h1>🔄 ĐỔI ĐƠN VỊ KỸ THUẬT</h1>
+        
+        <div class="control-group">
+            <label>1. Chọn loại đại lượng:</label>
+            <select id="measureType" onchange="updateUnits()">
+                <option value="length">📏 Chiều Dài (Length)</option>
+                <option value="area">squares Diện Tích (Area)</option>
+                <option value="pressure">⚙️ Áp Suất (Pressure)</option>
+                <option value="weight">⚖️ Khối Lượng (Weight)</option>
+                <option value="volume">💧 Thể Tích (Volume)</option>
+            </select>
+        </div>
+
+        <div class="converter-box">
+            <div class="unit-col">
+                <input type="number" id="inputVal" placeholder="Nhập số..." oninput="convert()" value="1">
+                <select id="fromUnit" onchange="convert()"></select>
+            </div>
+
+            <div class="arrow">➔</div>
+
+            <div class="unit-col">
+                <input type="text" id="outputVal" readonly style="background: #222; color: #4caf50; font-weight: bold;">
+                <select id="toUnit" onchange="convert()"></select>
+            </div>
+        </div>
+
+        <div class="result-display" id="resultText">...</div>
+    </div>
+
+    <script>
+        // Cấu hình các đơn vị và tỷ lệ quy đổi về đơn vị chuẩn (Base Unit)
+        // Length -> base: meter (m)
+        // Area -> base: square meter (m2)
+        // Weight -> base: kg
+        // Pressure -> base: Pascal (Pa)
+        // Volume -> base: Liter (l)
+
+        const unitsData = {
+            length: {
+                base: 'm',
+                units: {
+                    'mm': 0.001,
+                    'cm': 0.01,
+                    'm': 1,
+                    'km': 1000,
+                    'inch': 0.0254,
+                    'ft': 0.3048,
+                    'yard': 0.9144,
+                    'mile': 1609.34
+                }
+            },
+            area: {
+                base: 'm2',
+                units: {
+                    'mm2': 0.000001,
+                    'cm2': 0.0001,
+                    'm2': 1,
+                    'ha': 10000,
+                    'km2': 1000000,
+                    'ft2': 0.092903
+                }
+            },
+            pressure: {
+                base: 'Pa',
+                units: {
+                    'Pa': 1,
+                    'kPa': 1000,
+                    'MPa': 1000000,
+                    'Bar': 100000,
+                    'Psi': 6894.76,
+                    'Kg/cm2': 98066.5,
+                    'Atm': 101325
+                }
+            },
+            weight: {
+                base: 'kg',
+                units: {
+                    'g': 0.001,
+                    'kg': 1,
+                    'ton': 1000, // Tấn
+                    'lb': 0.453592, // Pound
+                    'oz': 0.0283495
+                }
+            },
+            volume: {
+                base: 'l',
+                units: {
+                    'ml': 0.001,
+                    'l': 1,
+                    'm3': 1000,
+                    'gal': 3.78541 // Gallon Mỹ
+                }
+            }
+        };
+
+        const typeSelect = document.getElementById('measureType');
+        const fromSelect = document.getElementById('fromUnit');
+        const toSelect = document.getElementById('toUnit');
+        const inputVal = document.getElementById('inputVal');
+        const outputVal = document.getElementById('outputVal');
+        const resultText = document.getElementById('resultText');
+
+        function updateUnits() {
+            const type = typeSelect.value;
+            const data = unitsData[type].units;
+            
+            // Xóa cũ
+            fromSelect.innerHTML = "";
+            toSelect.innerHTML = "";
+
+            // Thêm mới
+            for (let unit in data) {
+                let option1 = new Option(unit, unit);
+                let option2 = new Option(unit, unit);
+                fromSelect.add(option1);
+                toSelect.add(option2);
+            }
+
+            // Mặc định chọn cái thứ 2 cho cột đích để đỡ trùng
+            if (toSelect.options.length > 1) {
+                toSelect.selectedIndex = 1;
+            }
+            
+            convert();
+        }
+
+        function convert() {
+            const type = typeSelect.value;
+            const val = parseFloat(inputVal.value);
+            const from = fromSelect.value;
+            const to = toSelect.value;
+            const rates = unitsData[type].units;
+
+            if (isNaN(val)) {
+                outputVal.value = "";
+                resultText.innerText = "...";
+                return;
+            }
+
+            // Công thức: (Value * Rate_From) / Rate_To
+            // Bước 1: Đổi từ đơn vị nguồn về đơn vị chuẩn (Base)
+            const baseValue = val * rates[from];
+            
+            // Bước 2: Đổi từ chuẩn sang đích
+            const result = baseValue / rates[to];
+
+            // Làm tròn thông minh (nếu số quá nhỏ hoặc quá lớn)
+            let finalRes = result;
+            if (result < 0.0001 || result > 10000) {
+                 finalRes = result.toExponential(4); // Dạng khoa học 1.2e+5
+            } else {
+                 finalRes = parseFloat(result.toFixed(4)); // Làm tròn 4 số lẻ
+            }
+
+            outputVal.value = finalRes;
+            resultText.innerText = `${val} ${from} = ${finalRes} ${to}`;
+        }
+
+        // Khởi chạy lần đầu
+        updateUnits();
+    </script>
+</body>
+</html>
