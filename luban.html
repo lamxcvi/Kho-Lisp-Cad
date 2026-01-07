@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Thước Lỗ Ban Online</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
+        .container { max-width: 700px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { color: #d16d00; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .control-group { margin-bottom: 30px; }
+        label { display: block; margin-bottom: 10px; color: #fff; font-weight: bold; font-size: 1.2em; }
+        input { width: 100%; padding: 15px; border-radius: 50px; border: 2px solid #d16d00; background: #333; color: white; box-sizing: border-box; font-size: 24px; text-align: center; outline: none; font-weight: bold; }
+        input:focus { box-shadow: 0 0 15px rgba(209, 109, 0, 0.5); }
+
+        .btn-back { background-color: #444; margin-bottom: 20px; padding: 8px 15px; font-size: 14px; display: inline-block; text-decoration: none; border-radius: 4px; color: white;}
+
+        /* KẾT QUẢ */
+        .result-card {
+            background: #333;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: left;
+            border: 1px solid #444;
+            transition: transform 0.2s;
+        }
+        .result-card:hover { transform: translateY(-2px); }
+
+        .card-header {
+            padding: 10px 20px;
+            font-weight: bold;
+            color: #1e1e1e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-52 { background: #4ec9b0; } /* Xanh ngọc */
+        .header-42 { background: #569cd6; } /* Xanh dương */
+        .header-38 { background: #ce9178; } /* Cam đất */
+
+        .card-body { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between;}
+        
+        .cung-name { font-size: 1.5em; font-weight: bold; text-transform: uppercase; }
+        .cung-desc { font-style: italic; color: #aaa; font-size: 0.9em; margin-top: 5px; }
+        
+        .status-badge { padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; min-width: 80px; text-align: center;}
+        .good { background: rgba(76, 175, 80, 0.2); color: #4caf50; border: 1px solid #4caf50; }
+        .bad { background: rgba(255, 85, 85, 0.2); color: #ff5555; border: 1px solid #ff5555; }
+
+        .ruler-tape {
+            height: 10px;
+            background: repeating-linear-gradient(90deg, #555 0, #555 1px, transparent 1px, transparent 10px);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-back">⬅ Quay lại Trang chủ</a>
+
+    <div class="container">
+        <h1>📏 THƯỚC LỖ BAN ONLINE</h1>
+        <div class="ruler-tape"></div>
+
+        <div class="control-group">
+            <label>Nhập kích thước (mm):</label>
+            <input type="number" id="inputLen" placeholder="Ví dụ: 2150" oninput="calculateLuBan()" autofocus>
+        </div>
+
+        <div class="result-card">
+            <div class="card-header header-52">
+                <span>Thông Thủy (52.2cm)</span>
+                <span style="font-size: 0.8em;">Đo cửa đi, cửa sổ</span>
+            </div>
+            <div class="card-body">
+                <div>
+                    <div class="cung-name" id="name52">...</div>
+                    <div class="cung-desc" id="desc52">Nhập số để tra cứu</div>
+                </div>
+                <div class="status-badge" id="badge52">---</div>
+            </div>
+        </div>
+
+        <div class="result-card">
+            <div class="card-header header-42">
+                <span>Dương Trạch (42.9cm)</span>
+                <span style="font-size: 0.8em;">Đo khối xây, bếp, bậc</span>
+            </div>
+            <div class="card-body">
+                <div>
+                    <div class="cung-name" id="name42">...</div>
+                    <div class="cung-desc" id="desc42">Nhập số để tra cứu</div>
+                </div>
+                <div class="status-badge" id="badge42">---</div>
+            </div>
+        </div>
+
+        <div class="result-card">
+            <div class="card-header header-38">
+                <span>Âm Phần (38.8cm)</span>
+                <span style="font-size: 0.8em;">Đo bàn thờ, mộ</span>
+            </div>
+            <div class="card-body">
+                <div>
+                    <div class="cung-name" id="name38">...</div>
+                    <div class="cung-desc" id="desc38">Nhập số để tra cứu</div>
+                </div>
+                <div class="status-badge" id="badge38">---</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DỮ LIỆU CUNG ---
+        
+        // 1. Thước 52.2cm (Chu kỳ 522mm, chia 8 cung, mỗi cung 65.25mm)
+        const cung52 = [
+            { name: "Quý Nhân", type: "good", desc: "Gặp quý nhân, làm ăn phát đạt, con cái thông minh" },
+            { name: "Hiểm Họa", type: "bad", desc: "Gia chủ bị tán tài, trôi dạt tha hương" },
+            { name: "Thiên Tai", type: "bad", desc: "Đề phòng ốm đau, chết chóc, mất của" },
+            { name: "Thiên Tài", type: "good", desc: "May mắn tài lộc, con cái hiếu thảo" },
+            { name: "Nhân Lộc", type: "good", desc: "Phú quý, nghề nghiệp phát triển" },
+            { name: "Cô Độc", type: "bad", desc: "Hao người, hao của, biệt ly" },
+            { name: "Thiên Tặc", type: "bad", desc: "Bệnh bất ngờ, tai bay vạ gió, tù ngục" },
+            { name: "Tể Tướng", type: "good", desc: "Hanh thông mọi mặt, sinh con quý tử" }
+        ];
+
+        // 2. Thước 42.9cm (Chu kỳ 429mm, chia 8 cung, mỗi cung 53.625mm)
+        const cung42 = [
+            { name: "Tài", type: "good", desc: "Tài đức, báo ân, nghênh phúc" },
+            { name: "Bệnh", type: "bad", desc: "Thoát tài, cô quả, lao chấp" },
+            { name: "Ly", type: "bad", desc: "Trường khố, kiếp tài, quan quỷ" },
+            { name: "Nghĩa", type: "good", desc: "Thêm đinh, ích lợi, quý tử" },
+            { name: "Quan", type: "good", desc: "Thuận khoa, hoành tài, tiến ích" },
+            { name: "Kiếp", type: "bad", desc: "Tử biệt, thoái khẩu, ly hương" },
+            { name: "Hại", type: "bad", desc: "Tai chi, tử tuyệt, khẩu thiệt" },
+            { name: "Bản", type: "good", desc: "Tài chí, đăng khoa, tiến bảo" }
+        ];
+
+        // 3. Thước 38.8cm (Chu kỳ 388mm, chia 10 cung, mỗi cung 38.8mm)
+        const cung38 = [
+            { name: "Đinh", type: "good", desc: "Phúc tinh, đỗ đạt, tài vượng" },
+            { name: "Hại", type: "bad", desc: "Khẩu thiệt, bệnh tật, tử tuyệt" },
+            { name: "Vượng", type: "good", desc: "Thiên đức, hỷ sự, tiến bảo" },
+            { name: "Khổ", type: "bad", desc: "Thất thoát, quan quỷ, kiếp tài" },
+            { name: "Nghĩa", type: "good", desc: "Đại cát, tài vượng, ích lợi" },
+            { name: "Quan", type: "good", desc: "Phú quý, tiến bảo, thuận khoa" },
+            { name: "Tử", type: "bad", desc: "Ly hương, tử biệt, thất tài" },
+            { name: "Hưng", type: "good", desc: "Đăng khoa, quý tử, thêm đinh" },
+            { name: "Thất", type: "bad", desc: "Cô quả, lao chấp, công sự" },
+            { name: "Tài", type: "good", desc: "Nghênh phúc, lục hợp, tiến bảo" }
+        ];
+
+        function calculateLuBan() {
+            const val = parseFloat(document.getElementById('inputLen').value);
+
+            if (!val && val !== 0) {
+                resetView();
+                return;
+            }
+
+            // --- TÍNH TOÁN ---
+            // Thước 52.2 (8 cung)
+            const idx52 = Math.floor((val % 522) / (522/8));
+            updateCard(cung52[idx52], '52');
+
+            // Thước 42.9 (8 cung)
+            const idx42 = Math.floor((val % 429) / (429/8));
+            updateCard(cung42[idx42], '42');
+
+            // Thước 38.8 (10 cung)
+            const idx38 = Math.floor((val % 388) / 38.8);
+            updateCard(cung38[idx38], '38');
+        }
+
+        function updateCard(data, idSuffix) {
+            const nameEl = document.getElementById('name' + idSuffix);
+            const descEl = document.getElementById('desc' + idSuffix);
+            const badgeEl = document.getElementById('badge' + idSuffix);
+
+            nameEl.innerText = data.name;
+            descEl.innerText = data.desc;
+            
+            if (data.type === 'good') {
+                nameEl.style.color = '#4caf50'; // Xanh lá
+                badgeEl.className = 'status-badge good';
+                badgeEl.innerText = 'TỐT';
+            } else {
+                nameEl.style.color = '#ff5555'; // Đỏ
+                badgeEl.className = 'status-badge bad';
+                badgeEl.innerText = 'XẤU';
+            }
+        }
+
+        function resetView() {
+            ['52', '42', '38'].forEach(id => {
+                document.getElementById('name' + id).innerText = "...";
+                document.getElementById('name' + id).style.color = "#d4d4d4";
+                document.getElementById('desc' + id).innerText = "Nhập số để tra cứu";
+                document.getElementById('badge' + id).innerText = "---";
+                document.getElementById('badge' + id).className = "status-badge";
+            });
+        }
+    </script>
+</body>
+</html>
