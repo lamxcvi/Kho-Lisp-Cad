@@ -125,7 +125,15 @@
             <button class="guide-btn" onclick="openGuide('TC2I')">📖 Hướng dẫn</button>
         </div>
     </div>
-
+    <div class="lisp-item type-cad">
+        <div class="lisp-title">FixBlk - Chuẩn hóa Block</div>
+        <div class="lisp-desc">Chuyển toàn bộ đối tượng trong Block về Layer 0 và màu ByBlock.</div>
+        <div class="btn-group">
+            <button class="download-btn" onclick="checkPassAndDownload('FixBlk.lsp')">⬇ Tải về</button>
+            <button class="copy-btn" onclick="copyLink('FixBlk.lsp')">🔗 Copy Link</button>
+            <button class="guide-btn" onclick="openGuide('FixBlk')">📖 Hướng dẫn</button>
+        </div>
+    </div>
     <div id="section-revit" class="section-header" style="color: #569cd6;">
         <span class="section-icon">🏢</span> ADD-IN REVIT
     </div>
@@ -173,7 +181,13 @@
         'TL': `<b>Lệnh tắt:</b> TL<br>Quét chọn đối tượng để tính tổng chiều dài.`,
         'CB': `<b>Lệnh tắt:</b> CB<br>Quét chọn vùng để đếm Block.`,
         'TC2I': `<b>Lệnh tắt:</b> TC2I<br>Tự động chuyển màu layer về Index.`,
-        
+        'FixBlk': `
+            <b>Lệnh tắt:</b> <span class="cmd-highlight">FIXBLK</span><br><br>
+            1. Gõ lệnh FIXBLK.<br>
+            2. Quét chọn các Block cần sửa.<br>
+            3. Lisp sẽ chui vào bên trong Block, đưa tất cả nét về <b>Layer 0</b> và màu <b>ByBlock</b>.<br>
+            <i>Lưu ý: Tất cả Block cùng tên trong bản vẽ đều sẽ thay đổi theo.</i>
+        `,
         // Hướng dẫn cho Revit (Ví dụ)
         'RevitJoin': `
             <b>Cách cài đặt:</b><br>
