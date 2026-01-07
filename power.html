@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Công Suất & Chọn Dây</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { color: #4ec9b0; margin-top: 0; }
+        
+        .input-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 5px; color: #ce9178; font-weight: bold; }
+        select, input { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #555; background: #333; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: #4ec9b0; }
+
+        .btn-calc { background-color: #d16d00; width: 100%; margin-top: 10px; font-weight: bold; border: none; padding: 12px; border-radius: 5px; color: white; cursor: pointer; transition: 0.3s;}
+        .btn-calc:hover { background-color: #e67e00; }
+        .btn-back { background-color: #444; margin-bottom: 20px; padding: 8px 15px; font-size: 14px; display: inline-block; text-decoration: none; border-radius: 4px; color: white;}
+
+        .result-box { margin-top: 25px; text-align: left; background: #333; padding: 20px; border-radius: 8px; border-left: 5px solid #4caf50; display: none;}
+        .res-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;}
+        .res-val { font-weight: bold; color: #4ec9b0; }
+        .res-highlight { color: #ff5555; font-weight: bold; font-size: 1.2em;}
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-back">⬅ Quay lại Trang chủ</a>
+
+    <div class="container">
+        <h1>⚡ TÍNH TẢI & CHỌN DÂY</h1>
+        
+        <div class="input-group">
+            <label>1. Điện áp sử dụng:</label>
+            <select id="voltage">
+                <option value="220">1 Pha (220V)</option>
+                <option value="380">3 Pha (380V)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>2. Nhập công suất (P):</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="powerInput" placeholder="Nhập số..." style="flex: 2;">
+                <select id="powerUnit" style="flex: 1;">
+                    <option value="w">Watts (W)</option>
+                    <option value="kw">Kilowatts (kW)</option>
+                    <option value="hp">Mã lực (HP)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>3. Hệ số công suất (cosφ):</label>
+            <input type="number" id="cosphi" value="0.85" step="0.01">
+        </div>
+
+        <button class="btn-calc" onclick="calculateLoad()">TÍNH TOÁN NGAY</button>
+
+        <div class="result-box" id="resultBox">
+            <div class="res-row">
+                <span>Dòng điện tính toán (I):</span>
+                <span class="res-val res-highlight" id="resI">0 A</span>
+            </div>
+            <div class="res-row">
+                <span>Dây dẫn đề xuất (Cu/PVC):</span>
+                <span class="res-val" id="resCable">...</span>
+            </div>
+            <div class="res-row">
+                <span>Aptomat (MCB) đề xuất:</span>
+                <span class="res-val" id="resCB">...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateLoad() {
+            const u = parseInt(document.getElementById('voltage').value);
+            let p = parseFloat(document.getElementById('powerInput').value);
+            const unit = document.getElementById('powerUnit').value;
+            const cos = parseFloat(document.getElementById('cosphi').value) || 0.85;
+
+            if (!p) { alert("Vui lòng nhập công suất!"); return; }
+
+            // Đổi hết về Watts
+            if (unit === 'kw') p = p * 1000;
+            if (unit === 'hp') p = p * 746;
+
+            let I = 0;
+
+            // Tính dòng điện I = P / (U * cosphi * can3)
+            if (u === 220) {
+                I = p / (u * cos);
+            } else {
+                I = p / (u * 1.732 * cos);
+            }
+
+            // Chọn dây & CB sơ bộ
+            let cable = "1.5 mm²";
+            let cb = "6A";
+
+            if(I > 6) { cable = "1.5 mm²"; cb = "10A"; }
+            if(I > 10) { cable = "2.5 mm²"; cb = "16A"; }
+            if(I > 16) { cable = "4.0 mm²"; cb = "20A / 25A"; }
+            if(I > 25) { cable = "6.0 mm²"; cb = "32A / 40A"; }
+            if(I > 36) { cable = "10.0 mm²"; cb = "50A"; }
+            if(I > 50) { cable = "16.0 mm²"; cb = "63A"; }
+            if(I > 63) { cable = "25.0 mm²"; cb = "80A / 100A"; }
+            if(I > 90) { cable = "35.0 mm²"; cb = "125A"; }
+
+            document.getElementById('resI').innerText = I.toFixed(2) + " A";
+            document.getElementById('resCable').innerText = "CV " + cable;
+            document.getElementById('resCB').innerText = cb;
+            
+            document.getElementById('resultBox').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
