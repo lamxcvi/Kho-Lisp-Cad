@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xóa Phông Nền (V4 - Dynamic)</title>
+    <title>Xóa Phông Nền (V5 - Anti Block)</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
         .container { max-width: 800px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -63,7 +63,7 @@
     <a href="index.html" class="btn btn-back">⬅ Quay lại Trang chủ</a>
 
     <div class="container">
-        <h1>✨ AI XÓA PHÔNG NỀN (V4)</h1>
+        <h1>✨ AI XÓA PHÔNG NỀN (V5)</h1>
         
         <div class="control-group">
             <label>1. Chọn ảnh cần tách nền:</label>
@@ -91,7 +91,7 @@
         <a id="downloadLink" class="btn btn-download">⬇ TẢI ẢNH PNG</a>
 
         <div id="status-log">
-            <div>> Sẵn sàng. Vui lòng chọn ảnh.</div>
+            <div>> Hệ thống V5 sẵn sàng. Đang sử dụng server UNPKG.</div>
         </div>
     </div>
 
@@ -118,7 +118,6 @@
 
         let selectedFile = null;
 
-        // 1. Xử lý sự kiện chọn ảnh
         imageInput.addEventListener('change', (e) => {
             selectedFile = e.target.files[0];
             if (selectedFile) {
@@ -131,7 +130,6 @@
             }
         });
 
-        // 2. Xử lý sự kiện bấm nút (Dùng Dynamic Import để tránh bị chặn từ đầu)
         processBtn.addEventListener('click', async () => {
             if (!selectedFile) {
                 alert("Vui lòng chọn ảnh trước!");
@@ -140,16 +138,16 @@
 
             processBtn.disabled = true;
             loading.style.display = "block";
-            loadingText.innerText = "Đang tải thư viện AI (Dynamic Import)...";
-            log("Đang cố gắng tải thư viện AI từ CDN...", "warn");
+            loadingText.innerText = "Đang kết nối server AI...";
+            log("Đang tải thư viện từ UNPKG (để tránh bị chặn)...", "warn");
 
             try {
-                // --- ĐÂY LÀ ĐIỂM KHÁC BIỆT: IMPORT ĐỘNG ---
-                // Chỉ khi bấm nút mới tải thư viện. Nếu lỗi thì bắt được ngay.
-                const module = await import("https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.4/+esm");
+                // --- THAY ĐỔI QUAN TRỌNG: Dùng 'unpkg' thay vì 'jsdelivr' ---
+                // Link này thường ít bị chặn hơn
+                const module = await import("https://unpkg.com/@imgly/background-removal@1.0.4/+esm");
                 const removeBackground = module.default;
                 
-                log("Tải thư viện thành công! Đang cấu hình...", "normal");
+                log("Kết nối thành công! Đang tải Model...", "normal");
 
                 const config = {
                     publicPath: "https://static.imgly.com/lib/background-removal/v1.0.4/dist/",
@@ -157,11 +155,10 @@
                     progress: (key, current, total) => {
                         const percent = Math.round((current / total) * 100);
                         loadingText.innerText = `Đang tải Model: ${percent}%`;
-                        if(percent === 100) log(`Tải xong: ${key}`);
+                        if(percent === 100) log(`Đã tải xong module: ${key}`);
                     }
                 };
 
-                log("Bắt đầu tách nền...");
                 const imageBlob = await removeBackground(selectedFile, config);
                 
                 const url = URL.createObjectURL(imageBlob);
@@ -170,17 +167,16 @@
                 downloadLink.download = "No-BG-" + selectedFile.name.replace(/\.[^/.]+$/, "") + ".png";
                 downloadLink.style.display = "inline-block";
                 
-                log("HOÀN TẤT! Đã tách nền xong.");
+                log("THÀNH CÔNG! Đã tách nền xong.");
                 loadingText.innerText = "Xong!";
 
             } catch (error) {
                 console.error(error);
-                log("LỖI NGHIÊM TRỌNG: " + error.message, "error");
+                log("LỖI: " + error.message, "error");
                 
-                // Kiểm tra lỗi có phải do Brave chặn không
-                if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
-                    log("CẢNH BÁO: Trình duyệt (Brave) đã chặn kết nối!", "error");
-                    alert("⚠️ Trình duyệt Brave đang chặn tải AI!\nHãy tắt 'Brave Shield' (biểu tượng Sư tử cam) trên thanh địa chỉ rồi thử lại.");
+                if (error.message.includes("Failed to fetch")) {
+                    log("VẪN BỊ CHẶN? Hãy thử mở bằng Chrome hoặc Edge.", "error");
+                    alert("⚠️ Trình duyệt Brave vẫn đang chặn kết nối mạng.\n\nGiải pháp cuối cùng: Vui lòng mở trang web này bằng Google Chrome hoặc Microsoft Edge.");
                 } else {
                     alert("Có lỗi xảy ra: " + error.message);
                 }
