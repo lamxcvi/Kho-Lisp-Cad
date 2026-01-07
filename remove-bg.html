@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xóa Phông Nền (AI Remove Background)</title>
+    <title>Xóa Phông Nền (Debug Version)</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
         .container { max-width: 800px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -31,7 +31,6 @@
         .img-box img { max-width: 100%; max-height: 400px; display: block; }
         .img-label { margin-bottom: 10px; color: #888; font-style: italic; }
         
-        /* Background caro */
         .transparent-bg {
             background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%);
             background-size: 20px 20px;
@@ -40,12 +39,26 @@
 
         /* Loading */
         #loading { display: none; margin-top: 20px; color: #569cd6; font-weight: bold; }
-        #loadingText { font-size: 14px; color: #aaa; margin-top: 5px; }
         .spinner { border: 4px solid #333; border-top: 4px solid #569cd6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Error Message */
-        #errorMsg { display: none; color: #ff5555; background: rgba(255, 85, 85, 0.1); padding: 10px; border-radius: 5px; margin-top: 15px; border: 1px solid #ff5555; text-align: left; font-size: 14px;}
+        /* DEBUG CONSOLE */
+        #debug-console {
+            margin-top: 30px;
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: left;
+            height: 150px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            font-size: 12px;
+        }
+        .log-error { color: #ff5555; }
+        .log-warn { color: #ffaa00; }
+        .log-info { color: #00aaff; }
 
         @media (max-width: 600px) { .result-grid { grid-template-columns: 1fr; } }
     </style>
@@ -55,9 +68,8 @@
     <a href="index.html" class="btn btn-back">⬅ Quay lại Trang chủ</a>
 
     <div class="container">
-        <h1>✨ AI XÓA PHÔNG NỀN (V2)</h1>
-        <p style="color: #888; font-size: 0.9em;">Phiên bản đã sửa lỗi tải Model</p>
-
+        <h1>✨ AI XÓA PHÔNG NỀN (V3 - DEBUG)</h1>
+        
         <div class="control-group">
             <label>1. Chọn ảnh cần tách nền:</label>
             <input type="file" id="imageInput" accept="image/*">
@@ -67,11 +79,8 @@
         
         <div id="loading">
             <div class="spinner"></div>
-            <p>Đang xử lý... <br>Lần đầu sẽ tải khoảng 20MB dữ liệu AI.</p>
-            <p id="loadingText">Vui lòng đợi...</p>
+            <p id="loadingText">Đang khởi tạo...</p>
         </div>
-
-        <div id="errorMsg"></div>
 
         <div class="result-grid" id="resultGrid">
             <div class="img-box">
@@ -85,10 +94,28 @@
         </div>
 
         <a id="downloadLink" class="btn btn-download">⬇ TẢI ẢNH PNG</a>
+
+        <div id="debug-console">
+            <div>> Hệ thống sẵn sàng. Hãy chọn ảnh và bấm nút Bắt đầu.</div>
+            <div>> Lưu ý: Nếu dùng Brave, hãy tắt Shield (Sư tử cam).</div>
+        </div>
     </div>
 
     <script type="module">
         import removeBackground from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.4/+esm";
+
+        // --- HÀM GHI LOG RA MÀN HÌNH ---
+        const debugConsole = document.getElementById('debug-console');
+        function log(msg, type = 'normal') {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            div.innerHTML = `[${time}] ${msg}`;
+            if (type === 'error') div.className = 'log-error';
+            if (type === 'info') div.className = 'log-info';
+            debugConsole.appendChild(div);
+            debugConsole.scrollTop = debugConsole.scrollHeight;
+            console.log(msg);
+        }
 
         const imageInput = document.getElementById('imageInput');
         const processBtn = document.getElementById('processBtn');
@@ -98,7 +125,6 @@
         const originalImg = document.getElementById('originalImg');
         const resultImg = document.getElementById('resultImg');
         const downloadLink = document.getElementById('downloadLink');
-        const errorMsg = document.getElementById('errorMsg');
 
         let selectedFile = null;
 
@@ -110,7 +136,7 @@
                 resultGrid.style.display = "grid";
                 resultImg.src = "";
                 downloadLink.style.display = "none";
-                errorMsg.style.display = "none";
+                log(`Đã chọn file: ${selectedFile.name} (${(selectedFile.size/1024).toFixed(1)} KB)`);
             }
         });
 
@@ -122,35 +148,41 @@
 
             processBtn.disabled = true;
             loading.style.display = "block";
-            errorMsg.style.display = "none";
             downloadLink.style.display = "none";
-            loadingText.innerText = "Đang kết nối server để tải bộ não AI (sẽ mất khoảng 15-30 giây)...";
+            loadingText.innerText = "Đang kết nối server...";
+            log("Bắt đầu quy trình tách nền...", "info");
 
             try {
-                // CẤU HÌNH QUAN TRỌNG: Ép buộc tải tài nguyên từ CDN công cộng thay vì tải từ thư mục local
                 const config = {
+                    // Dùng URL này ổn định hơn cho bản 1.0.4
                     publicPath: "https://static.imgly.com/lib/background-removal/v1.0.4/dist/", 
-                    debug: true, // Bật chế độ debug để xem lỗi nếu có
+                    debug: true,
                     progress: (key, current, total) => {
-                        // Hiển thị tiến trình tải
                         const percent = Math.round((current / total) * 100);
-                        loadingText.innerText = `Đang tải dữ liệu: ${key} (${percent}%)`;
+                        const msg = `Đang tải: ${key} - ${percent}%`;
+                        loadingText.innerText = msg;
+                        // Chỉ log mỗi khi tải xong 1 file để đỡ lag
+                        if (percent === 100) log(`Tải xong module: ${key}`, "info");
                     }
                 };
 
+                log(`Đang gọi hàm AI với publicPath: ${config.publicPath}`);
+                
                 const imageBlob = await removeBackground(selectedFile, config);
+                
+                log("Xử lý thành công! Đang tạo ảnh kết quả...", "info");
                 const url = URL.createObjectURL(imageBlob);
                 
                 resultImg.src = url;
                 downloadLink.href = url;
-                downloadLink.download = "Da-Xoa-Nen.png";
+                downloadLink.download = "No-BG-" + selectedFile.name.replace(/\.[^/.]+$/, "") + ".png";
                 downloadLink.style.display = "inline-block";
                 loadingText.innerText = "Hoàn tất!";
 
             } catch (error) {
-                console.error(error);
-                errorMsg.style.display = "block";
-                errorMsg.innerHTML = "❌ <b>Lỗi xử lý:</b> " + error.message + "<br><br>Gợi ý: Hãy thử dùng trình duyệt Chrome/Edge và đảm bảo kết nối mạng ổn định để tải AI Model.";
+                log(`LỖI: ${error.message}`, "error");
+                log(`Chi tiết: ${JSON.stringify(error)}`, "error");
+                alert("Có lỗi xảy ra! Hãy xem khung đen bên dưới để biết chi tiết.");
             } finally {
                 processBtn.disabled = false;
                 loading.style.display = "none";
