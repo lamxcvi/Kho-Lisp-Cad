@@ -3,25 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tính Công Suất & Chọn Dây</title>
+    <title>Tính P-S-Q & Chọn Dây (Kinden Std)</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
-        .container { max-width: 600px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 10px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h1 { color: #4ec9b0; margin-top: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #1e1e1e; color: #d4d4d4; padding: 20px; text-align: center; }
+        .container { max-width: 700px; margin: 0 auto; background: #252526; padding: 30px; border-radius: 8px; border: 1px solid #3e3e42; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { color: #4ec9b0; margin-top: 0; text-transform: uppercase; font-size: 1.8em; }
+        .subtitle { color: #888; font-style: italic; font-size: 0.9em; margin-bottom: 25px; }
         
-        .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; margin-bottom: 5px; color: #ce9178; font-weight: bold; }
-        select, input { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #555; background: #333; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
-        input:focus { border-color: #4ec9b0; }
+        /* Grid Layout */
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; margin-bottom: 20px; }
+        .full-width { grid-column: span 2; }
+        
+        label { display: block; margin-bottom: 5px; color: #ce9178; font-weight: bold; font-size: 0.95em; }
+        select, input { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #555; background: #333; color: white; box-sizing: border-box; font-size: 15px; outline: none; }
+        input:focus, select:focus { border-color: #4ec9b0; background: #3c3c3c; }
 
-        .btn-calc { background-color: #d16d00; width: 100%; margin-top: 10px; font-weight: bold; border: none; padding: 12px; border-radius: 5px; color: white; cursor: pointer; transition: 0.3s;}
-        .btn-calc:hover { background-color: #e67e00; }
+        .btn-calc { background-color: #007acc; width: 100%; margin-top: 10px; font-weight: bold; border: none; padding: 12px; border-radius: 4px; color: white; cursor: pointer; transition: 0.3s; font-size: 16px; text-transform: uppercase; }
+        .btn-calc:hover { background-color: #0062a3; }
+        
         .btn-back { background-color: #444; margin-bottom: 20px; padding: 8px 15px; font-size: 14px; display: inline-block; text-decoration: none; border-radius: 4px; color: white;}
 
-        .result-box { margin-top: 25px; text-align: left; background: #333; padding: 20px; border-radius: 8px; border-left: 5px solid #4caf50; display: none;}
-        .res-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;}
-        .res-val { font-weight: bold; color: #4ec9b0; }
-        .res-highlight { color: #ff5555; font-weight: bold; font-size: 1.2em;}
+        /* KẾT QUẢ */
+        .result-panel { margin-top: 25px; text-align: left; background: #2d2d30; border: 1px solid #444; border-radius: 8px; overflow: hidden; display: none; }
+        .res-header { background: #3e3e42; padding: 10px 20px; font-weight: bold; color: #fff; border-bottom: 1px solid #555; }
+        .res-body { padding: 20px; }
+        
+        /* Bảng công suất P-S-Q */
+        .power-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: center; background: #252526; padding: 10px; border-radius: 5px; border: 1px dashed #555;}
+        .p-box { border-right: 1px solid #444; }
+        .p-box:last-child { border-right: none; }
+        .p-label { display: block; font-size: 0.8em; color: #aaa; margin-bottom: 5px; }
+        .p-val { font-size: 1.1em; font-weight: bold; color: #fff; }
+        .p-unit { font-size: 0.8em; color: #4ec9b0; }
+
+        .res-item { margin-bottom: 15px; border-bottom: 1px dashed #444; padding-bottom: 10px; }
+        .res-label { display: block; color: #888; font-size: 0.9em; margin-bottom: 3px; }
+        .res-value { font-size: 1.3em; font-weight: bold; color: #4ec9b0; }
+        .res-spec { font-family: monospace; color: #dcdcaa; font-size: 1.1em; }
+        
+        .highlight { color: #ce9178; } 
     </style>
 </head>
 <body>
@@ -29,91 +49,193 @@
     <a href="index.html" class="btn-back">⬅ Quay lại Trang chủ</a>
 
     <div class="container">
-        <h1>⚡ TÍNH TẢI & CHỌN DÂY</h1>
+        <h1>⚡ TÍNH P-S-Q & CHỌN DÂY</h1>
+        <div class="subtitle">Tiêu chuẩn Kinden Việt Nam (Safety First)</div>
         
-        <div class="input-group">
-            <label>1. Điện áp sử dụng:</label>
-            <select id="voltage">
-                <option value="220">1 Pha (220V)</option>
-                <option value="380">3 Pha (380V)</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <label>2. Nhập công suất (P):</label>
-            <div style="display: flex; gap: 10px;">
-                <input type="number" id="powerInput" placeholder="Nhập số..." style="flex: 2;">
-                <select id="powerUnit" style="flex: 1;">
-                    <option value="w">Watts (W)</option>
-                    <option value="kw">Kilowatts (kW)</option>
-                    <option value="hp">Mã lực (HP)</option>
+        <div class="input-grid">
+            <div>
+                <label>Nguồn điện (Voltage):</label>
+                <select id="voltage">
+                    <option value="1">1 Pha (220V)</option>
+                    <option value="3">3 Pha (380V)</option>
                 </select>
             </div>
+
+            <div>
+                <label>Loại tải (Hệ số K):</label>
+                <select id="loadType">
+                    <option value="1.0">Tĩnh (Đèn, Heater)</option>
+                    <option value="1.25">Động lực (Motor)</option>
+                    <option value="1.5">Thang máy / Cẩu</option>
+                </select>
+            </div>
+
+            <div class="full-width">
+                <label>Nhập giá trị đầu vào:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="inputVal" placeholder="Nhập số..." style="flex: 2;">
+                    <select id="inputUnit" style="flex: 1;">
+                        <option value="kw">kW (P)</option>
+                        <option value="hp">HP (Mã lực)</option>
+                        <option value="kva">kVA (S)</option>
+                        <option value="a">Ampe (I)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label>Hệ số công suất (cosφ):</label>
+                <input type="number" id="cosphi" value="0.85" step="0.05">
+            </div>
+
+             <div>
+                <label>Chiều dài dây (m):</label>
+                <input type="number" id="distance" value="20">
+            </div>
         </div>
 
-        <div class="input-group">
-            <label>3. Hệ số công suất (cosφ):</label>
-            <input type="number" id="cosphi" value="0.85" step="0.01">
-        </div>
+        <button class="btn-calc" onclick="calculate()">🚀 TÍNH TOÁN CHI TIẾT</button>
 
-        <button class="btn-calc" onclick="calculateLoad()">TÍNH TOÁN NGAY</button>
+        <div class="result-panel" id="resultPanel">
+            <div class="res-header">PHÂN TÍCH CÔNG SUẤT</div>
+            <div class="res-body">
+                
+                <div class="power-grid">
+                    <div class="p-box">
+                        <span class="p-label">Tác dụng (P)</span>
+                        <div class="p-val" id="outP">0</div>
+                        <span class="p-unit">kW</span>
+                    </div>
+                    <div class="p-box">
+                        <span class="p-label">Biểu kiến (S)</span>
+                        <div class="p-val" id="outS">0</div>
+                        <span class="p-unit">kVA</span>
+                    </div>
+                    <div class="p-box">
+                        <span class="p-label">Phản kháng (Q)</span>
+                        <div class="p-val" id="outQ">0</div>
+                        <span class="p-unit">kVAr</span>
+                    </div>
+                </div>
 
-        <div class="result-box" id="resultBox">
-            <div class="res-row">
-                <span>Dòng điện tính toán (I):</span>
-                <span class="res-val res-highlight" id="resI">0 A</span>
-            </div>
-            <div class="res-row">
-                <span>Dây dẫn đề xuất (Cu/PVC):</span>
-                <span class="res-val" id="resCable">...</span>
-            </div>
-            <div class="res-row">
-                <span>Aptomat (MCB) đề xuất:</span>
-                <span class="res-val" id="resCB">...</span>
+                <div class="res-item">
+                    <span class="res-label">Dòng điện tính toán (I design):</span>
+                    <span class="res-value highlight" id="resI">0 A</span>
+                    <div style="font-size: 0.8em; color: #666;">(Đã nhân hệ số an toàn K)</div>
+                </div>
+
+                <div class="res-item">
+                    <span class="res-label">Thiết bị đóng cắt (Breaker):</span>
+                    <span class="res-value" id="resBreaker">...</span>
+                </div>
+
+                <div class="res-item">
+                    <span class="res-label">Cáp nguồn (Feeder Cable - XLPE):</span>
+                    <div class="res-spec" id="resCable">...</div>
+                    <div class="res-spec" id="resEarth" style="font-size: 0.9em; color: #888;">...</div>
+                </div>
+                
             </div>
         </div>
     </div>
 
     <script>
-        function calculateLoad() {
-            const u = parseInt(document.getElementById('voltage').value);
-            let p = parseFloat(document.getElementById('powerInput').value);
-            const unit = document.getElementById('powerUnit').value;
+        const cableTable = [
+            { s: 1.5, iz: 24 }, { s: 2.5, iz: 33 }, { s: 4.0, iz: 45 }, { s: 6.0, iz: 57 },
+            { s: 10, iz: 76 }, { s: 16, iz: 101 }, { s: 25, iz: 135 }, { s: 35, iz: 169 },
+            { s: 50, iz: 207 }, { s: 70, iz: 268 }, { s: 95, iz: 328 }, { s: 120, iz: 383 },
+            { s: 150, iz: 444 }, { s: 185, iz: 510 }, { s: 240, iz: 607 }, { s: 300, iz: 703 }
+        ];
+        const breakerStd = [6, 10, 16, 20, 25, 32, 40, 50, 63, 75, 80, 100, 125, 150, 160, 200, 225, 250, 300, 400, 500, 630];
+
+        function calculate() {
+            const phase = parseInt(document.getElementById('voltage').value);
+            const k_factor = parseFloat(document.getElementById('loadType').value);
+            const val = parseFloat(document.getElementById('inputVal').value);
+            const unit = document.getElementById('inputUnit').value;
             const cos = parseFloat(document.getElementById('cosphi').value) || 0.85;
 
-            if (!p) { alert("Vui lòng nhập công suất!"); return; }
+            if (!val) { alert("Vui lòng nhập giá trị!"); return; }
 
-            // Đổi hết về Watts
-            if (unit === 'kw') p = p * 1000;
-            if (unit === 'hp') p = p * 746;
+            // 1. TÍNH TOÁN P, S, Q, I
+            let P_kw = 0, S_kva = 0, Q_kvar = 0, I_ampe = 0;
 
-            let I = 0;
-
-            // Tính dòng điện I = P / (U * cosphi * can3)
-            if (u === 220) {
-                I = p / (u * cos);
-            } else {
-                I = p / (u * 1.732 * cos);
+            // Quy đổi mọi thứ về S (kVA) trước để dễ tính
+            if (unit === 'kw') {
+                P_kw = val;
+                S_kva = P_kw / cos;
+            } else if (unit === 'hp') {
+                P_kw = val * 0.746;
+                S_kva = P_kw / cos;
+            } else if (unit === 'kva') {
+                S_kva = val;
+                P_kw = S_kva * cos;
+            } else if (unit === 'a') {
+                I_ampe = val;
+                // S = U * I * sqrt(3) / 1000
+                if (phase === 1) S_kva = (220 * I_ampe) / 1000;
+                else S_kva = (380 * 1.732 * I_ampe) / 1000;
+                
+                P_kw = S_kva * cos;
             }
 
-            // Chọn dây & CB sơ bộ
-            let cable = "1.5 mm²";
-            let cb = "6A";
+            // Tính Q = căn(S^2 - P^2)
+            Q_kvar = Math.sqrt(Math.pow(S_kva, 2) - Math.pow(P_kw, 2));
 
-            if(I > 6) { cable = "1.5 mm²"; cb = "10A"; }
-            if(I > 10) { cable = "2.5 mm²"; cb = "16A"; }
-            if(I > 16) { cable = "4.0 mm²"; cb = "20A / 25A"; }
-            if(I > 25) { cable = "6.0 mm²"; cb = "32A / 40A"; }
-            if(I > 36) { cable = "10.0 mm²"; cb = "50A"; }
-            if(I > 50) { cable = "16.0 mm²"; cb = "63A"; }
-            if(I > 63) { cable = "25.0 mm²"; cb = "80A / 100A"; }
-            if(I > 90) { cable = "35.0 mm²"; cb = "125A"; }
+            // Tính lại dòng điện I (nếu chưa có)
+            if (unit !== 'a') {
+                if (phase === 1) I_ampe = (S_kva * 1000) / 220;
+                else I_ampe = (S_kva * 1000) / (380 * 1.732);
+            }
 
-            document.getElementById('resI').innerText = I.toFixed(2) + " A";
-            document.getElementById('resCable').innerText = "CV " + cable;
-            document.getElementById('resCB').innerText = cb;
+            // Dòng tính toán (đã nhân hệ số an toàn/khởi động)
+            let I_design = I_ampe * k_factor;
+
+            // 2. CHỌN BREAKER
+            let In = breakerStd.find(at => at >= I_design);
+            if (!In) In = "MAX";
             
-            document.getElementById('resultBox').style.display = 'block';
+            let breakerType = (In <= 63) ? "MCB" : "MCCB";
+            let pole = (phase === 1) ? "2P" : "3P";
+
+            // 3. CHỌN CÁP (Iz >= In)
+            let selectedCable = cableTable.find(c => c.iz >= In);
+            if (!selectedCable) selectedCable = { s: "Busbar/Multiple", iz: 0 };
+            
+            // Tính dây Earth
+            let S_phase = selectedCable.s;
+            let Spe = "System";
+            if (typeof S_phase === 'number') {
+                if (S_phase <= 16) Spe = S_phase;
+                else if (S_phase <= 35) Spe = 16;
+                else Spe = S_phase / 2;
+                
+                // Chuẩn hóa Spe về size có thực
+                let realSpe = cableTable.find(c => c.s >= Spe);
+                if(realSpe) Spe = realSpe.s;
+            }
+
+            // 4. HIỂN THỊ
+            document.getElementById('outP').innerText = P_kw.toFixed(2);
+            document.getElementById('outS').innerText = S_kva.toFixed(2);
+            document.getElementById('outQ').innerText = Q_kvar.toFixed(2);
+            document.getElementById('resI').innerText = I_design.toFixed(1) + " A";
+
+            document.getElementById('resBreaker').innerText = `${breakerType} ${pole} ${In}A`;
+            
+            let cableName = "";
+            if (phase === 1) cableName = `Cu/XLPE/PVC 2C x ${S_phase} mm²`;
+            else {
+                if(typeof S_phase === 'number' && S_phase > 16)
+                    cableName = `Cu/XLPE/PVC 3C x ${S_phase} mm² + 1C x ${Math.max(S_phase/2, 16)} mm² N`;
+                else 
+                    cableName = `Cu/XLPE/PVC 4C x ${S_phase} mm²`;
+            }
+            
+            document.getElementById('resCable').innerText = cableName;
+            document.getElementById('resEarth').innerText = `+ 1C x ${Spe} mm² E (Tiếp địa)`;
+
+            document.getElementById('resultPanel').style.display = 'block';
         }
     </script>
 </body>
